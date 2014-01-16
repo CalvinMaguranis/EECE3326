@@ -1,3 +1,12 @@
+/*****************************************************
+EECE3326 Optimization Methods
+Professor Waleed Meleis
+
+    Project #1a
+    Sam Coe
+    Calvin Maguranis
+*****************************************************/
+
 #include <iostream>
 #include <vector>
 
