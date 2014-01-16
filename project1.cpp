@@ -17,7 +17,7 @@ class Code {
         // accessors
         vector<int> getCode() const { return code; }
         int getLength() const { return length; }
-        int getRange() const { return range; }
+        //int getRange() const { return range; }
 
         int checkCorrect(const Code&) const;
         void print() const;
@@ -25,13 +25,13 @@ class Code {
     private:
         vector<int> code;
         const int length;
-        const int range;
+        //const int range;
 
         void setCode(const vector<int> &v) { code = v; }
 };
 
 /* Code class member function definitions */
-Code::Code(const vector<int>& v) : code(v), length(v.size()), range(0) {}
+Code::Code(const vector<int>& v) : code(v), length(v.size()) {}
 
 Code::Code(const int n, const int m) : length(n), range(m) {
     vector<int> v(n, 0);
@@ -61,7 +61,7 @@ void Code::print() const {
 // note: separated from main for easier integration in the following projects
 Code makeGuess(const int len, const int range) {
     cout << "Make a guess for the secret code ";
-    cout << "(code values range from 0 to " << range << "): ";
+    cout << "(code values range from 0 to " << range-1 << "): ";
 
     // store guess one value at a time
     vector<int> code(len, 0);
@@ -94,7 +94,7 @@ int main() {
     cout << "Generated code: ";
     code.print();
 
-    Code guess = makeGuess(code.getLength(), code.getRange());
+    Code guess = makeGuess(code.getLength(), codeRange());
     correct = code.checkCorrect(guess);
     cout << "Numbers correct: " << correct << endl;
 
