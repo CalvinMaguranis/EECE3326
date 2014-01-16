@@ -42,7 +42,7 @@ class Code {
 /* Code class member function definitions */
 Code::Code(const vector<int>& v) : code(v), length(v.size()) {}
 
-Code::Code(const int n, const int m) : length(n), range(m) {
+Code::Code(const int n, const int m) : length(n) {
     vector<int> v(n, 0);
     for (int i = 0; i < n; i++) {
         v[i] = rand() % m;
@@ -103,7 +103,7 @@ int main() {
     cout << "Generated code: ";
     code.print();
 
-    Code guess = makeGuess(code.getLength(), codeRange());
+    Code guess = makeGuess(code.getLength(), codeRange);
     correct = code.checkCorrect(guess);
     cout << "Numbers correct: " << correct << endl;
 
