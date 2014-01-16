@@ -16,16 +16,18 @@ class Code {
 
         // accessors
         vector<int> getCode() const { return code; }
-        void setCode(const vector<int> &v) { code = v; }
         int getLength() const { return length; }
         int getRange() const { return range; }
 
         int checkCorrect(const Code&) const;
         void print() const;
+
     private:
         vector<int> code;
         const int length;
         const int range;
+
+        void setCode(const vector<int> &v) { code = v; }
 };
 
 /* Code class member function definitions */
@@ -41,7 +43,7 @@ Code::Code(const int n, const int m) : length(n), range(m) {
 
 int Code::checkCorrect(const Code& c) const {
     int count = 0;
-    for (int i = 0; i < c.getCode().size(); i++) {
+    for (int i = 0; i < c.getLength(); i++) {
         if (getCode()[i] == c.getCode()[i]) count++;
     }
     return count;
@@ -49,7 +51,7 @@ int Code::checkCorrect(const Code& c) const {
 
 void Code::print() const {
     vector<int> c = getCode();
-    for (int i = 0; i < c.size(); i++) {
+    for (int i = 0; i < getLength(); i++) {
         cout << c[i] << ' ';
     }
     cout << endl;
@@ -80,6 +82,8 @@ int main() {
     int codeRange = 0;
     int correct = 0;
 
+    srand(time(NULL));
+
     cout << "Enter code length: ";
     cin >> codeLength;
     cout << "Enter code value range: ";
@@ -87,7 +91,6 @@ int main() {
     cout << endl << endl;
 
     Code code(codeLength, codeRange);
-    srand(time(NULL));
     cout << "Generated code: ";
     code.print();
 
