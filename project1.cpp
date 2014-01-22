@@ -22,7 +22,7 @@ class Code {
         // constructors allow for either generating the random code or
         // inputing a pre-defined code
         Code(const vector<int>&);
-        Code(const int n, const int m);
+        Code(const int, const int);
 
         // accessors
         vector<int> getCode() const { return code; }
@@ -114,7 +114,7 @@ class Mastermind {
         const int range;
 };
 
-Mastermind::Mastermind() : secret(defaultLength, defaultRange),
+    Mastermind::Mastermind() : secret(defaultLength, defaultRange),
                            length(defaultLength),
                            range(defaultRange){}
 
