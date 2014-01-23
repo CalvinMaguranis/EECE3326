@@ -22,8 +22,9 @@ class Mastermind {
     private:
         Code makeGuess() const;
         const Code secret;
-        static const int defaultLength = 4;
-        static const int defaultRange = 10;
+        const int defaultLength = 4;
+        const int defaultRange = 10;
+        const int maxGuesses = 10;
         const int length;
         const int range;
 };

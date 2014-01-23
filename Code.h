@@ -3,7 +3,7 @@
   Professor Waleed Meleis
 
   Code.h
-  Project #1b: Code class declaration
+  Project #1a: Code class declaration
   Sam Coe
   Calvin Maguranis
  *****************************************************/

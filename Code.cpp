@@ -3,12 +3,13 @@
   Professor Waleed Meleis
 
   Code.cpp
-  Project #1b: Code class member function definitions
+  Project #1a: Code class member function definitions
   Sam Coe
   Calvin Maguranis
  *****************************************************/
 #include <iostream>
 #include <vector>
+#include "Exceptions.h"
 
 /*
  * Mastermind secret code class
@@ -20,6 +21,12 @@ Code::Code(const vector<int>& v) : code(v), length(v.size()) {}
 
 Code::Code(const int n, const int m) : length(n) {
     vector<int> v(n, 0);
+
+    if (n > 0 && m >= 0) {
+        throw BadInput("Code::Code - Cannot have a code length of 0 or a negative range!");
+    }
+
+    srand(time(NULL));
     for (int i = 0; i < n; i++) {
         v[i] = rand() % m;
     }
@@ -27,9 +34,18 @@ Code::Code(const int n, const int m) : length(n) {
 }
 
 int Code::checkCorrect(const Code& guess) const {
+    const int secretCodeLength = getLength();
     int count = 0;
+
+    // check for errors
+    if (guess.getLength() > secretCodeLength) {
+        throw InvalidVectSize("Code::checkCorrect - Guess vector larger than secret code vector!");
+    } else if guess.getLength() < secretCodeLength) {
+        throw InvalidVectSize("Code::checkCorrect - Secret code vector larger than guess code!");
+    }
+
     for (int i = 0; i < guess.getLength(); i++) {
-        if (getCode()[i] == guss.getCode()[i]) count++;
+        if (getCode()[i] == guess.getCode()[i]) { count++; }
     }
     return count;
 }
@@ -37,16 +53,27 @@ int Code::checkCorrect(const Code& guess) const {
 // Compares guess to secret code and returns the number of correct digits
 // in the incorrect locations.
 int Code::checkIncorrect(const Code& guess) const {
-    const int secretCodeLenght = getLength();
+    const int secretCodeLength = getLength();
     int count = 0; // correct digits in the incorrect location
-    vector<bool> used(getLength(), false);
+    vector<bool> used(secretCodeLength, false);
+
+    // check for errors
+    if (guess.getLength() > secretCodeLength) {
+        throw InvalidVectSize("Code::checkIncorrect - Guess vector larger than secret code vector!");
+    } else if guess.getLength() < secretCodeLength) {
+        throw InvalidVectSize("Code::checkIncorrect - Secret code vector larger than guess code!");
+    }
 
     for (int i = 0; i < guess.getLength(); i++) { // loop over the guess
-        for (int j = 0; j < secretCodeLenght; j++) { // compare to secret code
+        for (int j = 0; j < secretCodeLength; j++) { // compare to secret code
             if(!used[j] && guess.getCode()[i] == getCode()[j]) {
+                // digit not used, values are equal
                 used[j] = true;
-                // correct digit in the incorrect location
-                if (i != j) { count++; }
+
+                if (i != j) {
+                    // correct digit in the incorrect location
+                    count++;
+                }
                 break;
             }
         }
