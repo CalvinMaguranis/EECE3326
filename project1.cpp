@@ -8,7 +8,6 @@
  *****************************************************/
 #include <iostream>
 #include <vector>
-#include "Code.h"
 #include "MasterMind.h"
 
 using namespace std;
