@@ -9,7 +9,9 @@
  *****************************************************/
 #include <iostream>
 #include <vector>
+#include <time.h>
 #include "Exceptions.h"
+#include "Code.h"
 
 /*
  * Mastermind secret code class
@@ -17,16 +19,16 @@
  * to random code
  */
 
-Code::Code(const vector<int>& v) : code(v), length(v.size()) {}
+Code::Code(const std::vector<int>& v) : code(v), length(v.size()) {}
 
 Code::Code(const int n, const int m) : length(n) {
-    vector<int> v(n, 0);
+    std::vector<int> v(n, 0);
 
     if (n > 0 && m >= 0) {
         throw BadInput("Code::Code - Cannot have a code length of 0 or a negative range!");
     }
 
-    srand(time(NULL));
+    std::srand(time(NULL));
     for (int i = 0; i < n; i++) {
         v[i] = rand() % m;
     }
@@ -39,9 +41,9 @@ int Code::checkCorrect(const Code& guess) const {
 
     // check for errors
     if (guess.getLength() > secretCodeLength) {
-        throw InvalidVectSize("Code::checkCorrect - Guess vector larger than secret code vector!");
-    } else if guess.getLength() < secretCodeLength) {
-        throw InvalidVectSize("Code::checkCorrect - Secret code vector larger than guess code!");
+        throw InvalidVectSize("Code::checkCorrect - Guess std::vector larger than secret code std::vector!");
+    } else if (guess.getLength() < secretCodeLength) {
+        throw InvalidVectSize("Code::checkCorrect - Secret code std::vector larger than guess code!");
     }
 
     for (int i = 0; i < guess.getLength(); i++) {
@@ -55,13 +57,13 @@ int Code::checkCorrect(const Code& guess) const {
 int Code::checkIncorrect(const Code& guess) const {
     const int secretCodeLength = getLength();
     int count = 0; // correct digits in the incorrect location
-    vector<bool> used(secretCodeLength, false);
+    std::vector<bool> used(secretCodeLength, false);
 
     // check for errors
     if (guess.getLength() > secretCodeLength) {
-        throw InvalidVectSize("Code::checkIncorrect - Guess vector larger than secret code vector!");
-    } else if guess.getLength() < secretCodeLength) {
-        throw InvalidVectSize("Code::checkIncorrect - Secret code vector larger than guess code!");
+        throw InvalidVectSize("Code::checkIncorrect - Guess std::vector larger than secret code std::vector!");
+    } else if (guess.getLength() < secretCodeLength) {
+        throw InvalidVectSize("Code::checkIncorrect - Secret code std::vector larger than guess code!");
     }
 
     for (int i = 0; i < guess.getLength(); i++) { // loop over the guess
@@ -82,15 +84,15 @@ int Code::checkIncorrect(const Code& guess) const {
 }
 
 void Code::print() const {
-    vector<int> c = getCode();
+    std::vector<int> c = getCode();
     for (int i = 0; i < getLength(); i++) {
-        cout << c[i] << ' ';
+        std::cout << c[i] << ' ';
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 
 // overload output operator for Code class
-ostream& operator<<(ostream& out, const Code& c) {
+std::ostream& operator<<(std::ostream& out, const Code& c) {
     out << c.code;
     return out;
 }
