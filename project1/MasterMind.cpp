@@ -30,9 +30,10 @@ Mastermind::Mastermind(const int codeLength, const int codeRange) :
                         range(codeRange) {}
 
 void Mastermind::play() const {
-    cout << "Secret code: " << secret << endl << endl;
-    int guesses = 0;
+	int guesses = 0;
 
+    cout << "Secret code: " << secret << endl << endl;
+    
     for (guesses = maxGuesses; guesses > 0; guesses--) {
         cout << "Guesses left: " << guesses << endl;
         Code guess = makeGuess();

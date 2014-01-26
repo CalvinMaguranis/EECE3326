@@ -11,6 +11,7 @@
 #define CODE_H
 #include <vector>
 #include <iostream>
+using namespace std;
 
 /*
  * Mastermind secret code class
@@ -21,11 +22,11 @@ class Code {
 	public:
         // constructors allow for either generating the random code or
         // inputing a pre-defined code
-        Code(const std::vector<int>& v);
+        Code(const vector<int>& v);
         Code(const int n, const int m);
 
         // accessors
-        std::vector<int> getCode() const { return code; }
+        vector<int> getCode() const { return code; }
         int getLength() const { return length; }
 
         int checkCorrect(const Code&) const;
@@ -33,12 +34,12 @@ class Code {
         void print() const;
 
         // overloaded output operator
-        friend std::ostream& operator<<(std::ostream&, const Code&);
+        friend ostream& operator<<(ostream&, const Code&);
 
     private:
-        void setCode(const std::vector<int> &v) { code = v; }
+        void setCode(const vector<int> &v) { code = v; }
 
-        std::vector<int> code;
+        vector<int> code;
         const int length;
 };
 

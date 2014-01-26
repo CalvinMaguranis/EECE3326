@@ -34,11 +34,9 @@ int main() {
 
     try {
         if (codeLength > 0 && codeRange >= 0) {
-            // cannot have a length of 0
             Mastermind game(codeLength, codeRange);
             game.play();
         } else {
-            // use default constructor
             Mastermind game;
             game.play();
         }

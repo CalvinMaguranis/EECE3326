@@ -10,6 +10,7 @@
 #ifndef MASTERMIND_H
 #define MASTERMIND_H
 #include "Code.h"
+using namespace std;
 
 /*
  * Mastermind class
