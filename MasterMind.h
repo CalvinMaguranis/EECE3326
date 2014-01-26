@@ -9,6 +9,7 @@
  *****************************************************/
 #ifndef MASTERMIND_H
 #define MASTERMIND_H
+#include "Code.h"
 
 /*
  * Mastermind class

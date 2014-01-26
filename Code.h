@@ -9,6 +9,8 @@
  *****************************************************/
 #ifndef CODE_H
 #define CODE_H
+#include <vector>
+#include <iostream>
 
 /*
  * Mastermind secret code class
@@ -16,11 +18,11 @@
  * to random code
  */
 class Code {
-    public:
+	public:
         // constructors allow for either generating the random code or
         // inputing a pre-defined code
-        Code(const vector<int>&);
-        Code(const int, const int);
+        Code(const vector<int>& v);
+        Code(const int n, const int m);
 
         // accessors
         vector<int> getCode() const { return code; }
