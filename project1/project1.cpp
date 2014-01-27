@@ -30,6 +30,7 @@ ostream& operator<<(ostream& out, const Code& c) {
 int main() {
     int codeLength = 0;
     int codeRange = 0;
+	int wait = 0;
 
     cout << "Enter code length: ";
     cin >> codeLength;
@@ -47,11 +48,15 @@ int main() {
         }
     } catch (BadInput &ex) {
         cout << "Bad input: " << ex.what() << endl;
+		exit(0);
     } catch (InvalidVectSize &ex) {
         cout << "Invalid vector size: " << ex.what() << endl;
+		exit(0);
     } catch ( ... ) {
         cout << "Unhandled exception found!" << endl;
+		exit(0);
     }
 
+	system("PAUSE");
     return 1;
 }

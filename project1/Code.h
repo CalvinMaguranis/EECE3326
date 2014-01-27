@@ -28,10 +28,12 @@ class Code {
 
         // accessors
         vector<int> getCode() const { return code; }
-        int getLength() const { return length; }
+		vector<bool> getUsed() const { return used; }
+		void setUsed(const vector<bool> &v) { used = v; }
+		int getLength() const { return length; }
 
-        int checkCorrect(const Code&) const;
-        int checkIncorrect(const Code&) const;
+        int checkCorrect(Code&);
+        int checkIncorrect(Code&);
         void print() const;
 
         // overloaded output operator
@@ -39,8 +41,9 @@ class Code {
 
     private:
         void setCode(const vector<int> &v) { code = v; }
-
+		
         vector<int> code;
+		vector<bool> used;
         const int length;
 };
 

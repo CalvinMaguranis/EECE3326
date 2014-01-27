@@ -30,9 +30,9 @@ Mastermind::Mastermind(const int codeLength, const int codeRange) :
                         length(codeLength),
                         range(codeRange) {}
 
-void Mastermind::play() const {
+void Mastermind::play() {
 	int guesses = 0;
-
+	
     cout << "Secret code: " << secret << endl << endl;
     
     for (guesses = maxGuesses; guesses > 0; guesses--) {
@@ -46,7 +46,7 @@ void Mastermind::play() const {
 
         int incorrect = secret.checkIncorrect(guess);
         cout << "Numbers that are correct and in the correct position: " << correct << endl;
-        cout << "Numbers that are correct and not in the incorrect position: " << incorrect << endl << endl;
+        cout << "Numbers that are correct but not in the correct position: " << incorrect << endl << endl;
     }
 
     if (guesses > 0) {
@@ -66,9 +66,6 @@ Code Mastermind::makeGuess() const {
     int value = 0;
     for (int i = 0; i < length; i++) {
         cin >> value;
-        if (value > range) {
-            throw BadInput("MasterMind::makeGuess - Invalid value given, must be within 0 and given range!");
-        }
         code[i] = value;
     }
 

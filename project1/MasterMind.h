@@ -21,13 +21,13 @@ class Mastermind {
     public:
         Mastermind();
         Mastermind(const int n, const int m);
-        void play() const;
+        void play();
     private:
         Code makeGuess() const;
-        const Code secret;
-        const int defaultLength = 4;
-        const int defaultRange = 10;
-        const int maxGuesses = 10;
+        Code secret;
+        static const int defaultLength = 4;
+        static const int defaultRange = 10;
+        static const int maxGuesses = 10;
         const int length;
         const int range;
 };

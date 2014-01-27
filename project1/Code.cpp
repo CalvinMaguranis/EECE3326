@@ -9,7 +9,8 @@
  *****************************************************/
 #include <iostream>
 #include <vector>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 #include "Exceptions.h"
 #include "Code.h"
 
@@ -21,67 +22,76 @@ using namespace std;
  * to random code
  */
 
-Code::Code(const vector<int>& v) : code(v), length(v.size()) {}
+Code::Code(const vector<int>& v) : code(v), length(v.size()), used(v.size(), false) {}
 
 Code::Code(const int n, const int m) : length(n) {
+	// initialize our vectors
     vector<int> v(n, 0);
+	vector<bool> used(n, false);
 
+	// check input ranges are correct
     if (n <= 0 || m < 0) {
         throw BadInput("Code::Code - Cannot have a code length of 0 or a negative range!");
     }
 
-    srand(time(NULL));
+    srand(time(0));
     for (int i = 0; i < n; i++) {
         v[i] = rand() % m;
     }
     setCode(v);
 }
 
-int Code::checkCorrect(const Code& guess) const {
+// Compares guess to secret code and returns the number of correct digits
+// in the correct locations.
+int Code::checkCorrect(Code& guess) {
     const int secretCodeLength = getLength();
     int count = 0;
+	vector<bool> correct(secretCodeLength, false);
 
-    // check for errors
-    if (guess.getLength() > secretCodeLength) {
-        throw InvalidVectSize("Code::checkCorrect - Guess vector larger than secret code vector!");
-    } else if (guess.getLength() < secretCodeLength) {
-        throw InvalidVectSize("Code::checkCorrect - Secret code vector larger than guess code!");
+	/// check vector lengths
+    if (guess.getLength() != secretCodeLength) {
+        throw InvalidVectSize("Code::checkCorrect - vectors are not the same length!");
     }
 
     for (int i = 0; i < guess.getLength(); i++) {
-        if (getCode()[i] == guess.getCode()[i]) { count++; }
+        if (getCode()[i] == guess.getCode()[i]) {
+			// mark both the secret and guess code index values if used
+			correct[i] = true;
+			count++; 
+		}
     }
+	setUsed(correct);
+	guess.setUsed(correct);
     return count;
 }
 
 // Compares guess to secret code and returns the number of correct digits
 // in the incorrect locations.
-int Code::checkIncorrect(const Code& guess) const {
+int Code::checkIncorrect(Code& guess) {
     const int secretCodeLength = getLength();
     int count = 0; // correct digits in the incorrect location
-    vector<bool> used(secretCodeLength, false);
+	vector<bool> secretUsed = getUsed();
+	vector<bool> guessUsed = guess.getUsed();
+    
+    /// check vector lengths
+	if (guess.getLength() != secretCodeLength) {
+		throw InvalidVectSize("Code::checkCorrect - vectors are not the same length!");
+	}
 
-    // check for errors
-    if (guess.getLength() > secretCodeLength) {
-        throw InvalidVectSize("Code::checkIncorrect - Guess vector larger than secret code vector!");
-    } else if (guess.getLength() < secretCodeLength) {
-        throw InvalidVectSize("Code::checkIncorrect - Secret code vector larger than guess code!");
-    }
-
-    for (int i = 0; i < guess.getLength(); i++) { // loop over the guess
-        for (int j = 0; j < secretCodeLength; j++) { // compare to secret code
-            if(!used[j] && guess.getCode()[i] == getCode()[j]) {
-                // digit not used, values are equal
-                used[j] = true;
-
-                if (i != j) {
-                    // correct digit in the incorrect location
-                    count++;
-                }
-                break;
-            }
-        }
-    }
+	// compare all unused guess values to current unused secret code value
+	for (int i = 0; i < secretCodeLength; i++) {
+		for (int j = 0; j < guess.getLength(); j++) {
+			if ((!secretUsed[i] && !guessUsed[j]) &&
+				(getCode()[i] == guess.getCode()[j] )) {
+				// we have a match, mark these indices as used and 
+				// increase the count before continuing the compare
+				secretUsed[i] = true;
+				guessUsed[j] = true;
+				count++;
+				break;
+			}
+		}
+	}
     return count;
 }
 
