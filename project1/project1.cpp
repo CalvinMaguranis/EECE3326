@@ -21,6 +21,12 @@ ostream& operator<<(ostream& out, const vector<T>& v) {
     return out;
 }
 
+// overload output operator for Code class
+ostream& operator<<(ostream& out, const Code& c) {
+	out << c.code;
+	return out;
+}
+
 int main() {
     int codeLength = 0;
     int codeRange = 0;

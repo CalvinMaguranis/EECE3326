@@ -9,29 +9,30 @@
  *****************************************************/
 #ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
-#include <exception>
-#include <string>
+#include <iostream>
 
 using namespace std;
 
-class BadInput : public exception {
-	// definition taken from stdexcept.h exception derived classes
+class BadInput {
 public:
-	typedef exception exc;
+	BadInput() : exc_msg("BadInput!") {}
+	BadInput(const char* msg) : exc_msg(msg) {}
 
-	explicit BadInput(const string& what) : exc(what.c_str()) {}
-	explicit BadInput(const char* what) : exc(what) {}
+	const char* what() { return exc_msg; }
 private:
+	const char *exc_msg;
+	
 };
 
-class InvalidVectSize : public exception {
-	// definition taken from stdexcept.h exception derived classes
+class InvalidVectSize {
 public:
-	typedef exception exc;
+	InvalidVectSize() : exc_msg("InvalidVectSize!") {}
+	InvalidVectSize(const char* msg) : exc_msg(msg) {}
 
-	explicit InvalidVectSize(const string& what) : exc(what.c_str()) {}
-	explicit InvalidVectSize(const char* what) : exc(what) {}
+	const char* what() { return exc_msg; }
 private:
+	const char *exc_msg;
+	
 };
 
 #endif /* EXCEPTIONS_H */

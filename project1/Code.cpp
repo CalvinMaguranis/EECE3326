@@ -92,9 +92,3 @@ void Code::print() const {
     }
     cout << endl;
 }
-
-// overload output operator for Code class
-ostream& operator<<(ostream& out, const Code& c) {
-    out << c.code;
-    return out;
-}
