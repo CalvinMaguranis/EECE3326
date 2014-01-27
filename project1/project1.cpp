@@ -10,7 +10,6 @@
 #include <vector>
 #include "MasterMind.h"
 #include "Exceptions.h"
-
 using namespace std;
 
 // overload output operator for vectors

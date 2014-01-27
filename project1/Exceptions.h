@@ -11,6 +11,7 @@
 #define EXCEPTIONS_H
 #include <exception>
 #include <string>
+
 using namespace std;
 
 class BadInput : public exception {
