@@ -8,6 +8,7 @@
  *****************************************************/
 #include <iostream>
 #include <vector>
+#include <cstdlib>
 #include "MasterMind.h"
 #include "Exceptions.h"
 using namespace std;
@@ -57,6 +58,8 @@ int main() {
 		exit(0);
     }
 
-	system("PAUSE");
+	// so Windows doesn't close the console prematurely,
+	// remove for *nix environments
+	system("PAUSE"); 
     return 1;
 }
