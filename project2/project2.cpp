@@ -1,6 +1,4 @@
-#include <iostream>
 #include "carddeck.h"
-#include "d_except.h"
 
 using namespace std;
 

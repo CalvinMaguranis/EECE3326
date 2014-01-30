@@ -1,12 +1,9 @@
 #ifndef CARDDECK_H
 #define CARDDECK_H
 
-#include <string>
 #include <iostream>
 #include "d_except.h"
 #include "d_node.h"
-
-using namespace std;
 
 // public enumerations
 enum SUIT_TYPE { CLUB, DIAMOND, HEART, SPADE };
