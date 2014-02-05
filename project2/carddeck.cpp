@@ -1,4 +1,6 @@
+#include <ctime>
 #include "carddeck.h"
+using namespace std;
 
 deck::deck() {
     int decksize = 52;
@@ -82,46 +84,54 @@ void deck::replace(card c) {
 }
 
 void deck::shuffle() {
+	int count = getCount();
+	int r = 0;
     // seed random number generator
     srand(time(0));
 
-    // create pointer array pointing to each node
-    node<card>* a[count];
+    // create pointer array pointing and 
+	// allocate space for each card in the deck
+	node<card>* a = new node<card>[count];
     node<card>* curr = getTopCard();
-    for (int i = 0; i < count; i++) {
-        a[i] = curr;
+	for (int i = 0; i < getCount(); i++) {
+		a[i] = *curr;
         curr = curr->next;
     }
 
     // fisher-yates shuffle algorithm on array
     for (int i = 0; i < count; i++) {
-        int r = rand() % count;
-        node<card>* tmp = a[r];
+        r = rand() % count;
+        node<card>* tmp = &a[r];
         a[r] = a[i];
-        a[i] = tmp;
+        a[i] = *tmp;
     }
 
     // relink cards to create shuffled deck
-    curr = a[0];
+    curr = &a[0];
     for (int i = 1; i < count; i++) {
-        curr->next = a[i];
+        curr->next = &a[i];
         curr = curr->next;
     }
 
     // set top card to beginning of shuffled deck
-    setTopCard(a[0]);
+    setTopCard(&a[0]);
+
+	// free pointer array
+	delete(a);
 }
 
 deck& deck::operator=(const deck& d) {
-    if (this == &d) return *this;
-    //TODO: copy deck from old to new not just the pointer
+	if (this == &d) { return *this; }
+
+	this->setCount(d.getCount());
+	this->setTopCard(d.getTopCard());
     return *this;
 }
 
-//TODO: How to overcome const data members
 card& card::operator=(const card& c) {
-    if (this == &c) return *this;
-    //suit = c.getSuit();
-    //cardVal = c.getValue();
+	if (this == &c) { return *this; }
+
+    this->suit = c.getSuit();
+	this->cardVal = c.getValue();
     return *this;
 }

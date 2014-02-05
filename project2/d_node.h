@@ -14,7 +14,7 @@ class node
         node<T> *next;    // next node in the list
 
         // default constructor with no initial value
-        node() : next(NULL){}
+        node() : next(NULL) {}
 
         // constructor. initialize nodeValue and next
         node(const T& item, node<T> *nextNode = NULL) :
