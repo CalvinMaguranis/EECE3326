@@ -14,6 +14,7 @@ class card {
     public:
         // cards MUST be initialized with values
         card(const SUIT_TYPE s, const int c) : suit(s), cardVal(c) {};
+        card(const card& c) : suit(c.getSuit()), cardVal(c.getValue()) {};
         // accessors
         SUIT_TYPE getSuit() const { return suit; }
         int getValue() const { return cardVal; }
@@ -26,11 +27,18 @@ class card {
 class deck {
     public:
         deck();
-        node<card> *getTopCard() const { return topCard;}
+        deck(const deck&);
+        ~deck();
+        node<card> *getTopCard() const { return topCard; }
+        card deal();
+        void replace(card c);
+        void shuffle();
     private:
+        void setTopCard(node<card>* c) { topCard = c; }
+        int getCount() const { return count; }
+        void setCount(int c) { count = c; }
+        int count;
         node<card> *topCard;
 };
-
-
 
 #endif /* CARDDECK_H */
