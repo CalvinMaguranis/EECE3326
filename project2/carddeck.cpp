@@ -26,26 +26,12 @@ deck::deck() {
     }
 }
 
+// copy constructor
 deck::deck(const deck& d) {
     // seed random number generator
     srand(time(0));
 
-    //XXX
-    if (d.getCount() > maxDeckSize)
-        // perform deep copy on deck cards
-        setCount(d.getCount());
-    if (d.getTopCard() == NULL) {
-        setTopCard(NULL);
-    } else {
-        node<card>* oCurr = d.getTopCard();
-        node<card>* curr = new node<card>(card(oCurr->nodeValue));
-        setTopCard(curr);
-        for (int i = 0; i < count; i++) {
-            curr->next = new node<card>(card(oCurr->next->nodeValue));
-            curr = curr->next;
-            oCurr = oCurr->next;
-        }
-    }
+    *this = d;
 }
 
 deck::~deck() {
@@ -70,10 +56,11 @@ card deck::deal() {
 }
 
 void deck::replace(card c) {
-    //XXX
-    if (c.getSuit() == NULL || c.getValue() == NULL) {
+    // check range
+    if ((c.getSuit() <= 0 || c.getSuit() >= 3) || (c.getValue() < 1 || c.getValue() > 13)) { // invalid 
         throw rangeError("Invalid card input!");
     }
+    
     node<card>* prev;
     node<card>* curr = getTopCard();
     if (curr == NULL) { throw referenceError("Deck top card uninitialized!"); }
@@ -200,9 +187,26 @@ void deck::shuffle2() {
 
 deck& deck::operator=(const deck& d) {
     if (this == &d) { return *this; }
-    //XXX Change to do deep copy
-    this->setCount(d.getCount());
-    this->setTopCard(d.getTopCard());
+    
+    // check for input errors
+    if (d.getCount() > maxDeckSize) { throw rangeException("Deck size is larger than max allowed"); }
+    
+    // perform deep copy on deck cards
+    setCount(d.getCount());
+    
+    if (d.getTopCard() == NULL) { 
+        setTopCard(NULL);
+    } else {
+        node<card>* oCurr = d.getTopCard();
+        node<card>* curr = new node<card>(card(oCurr->nodeValue));
+        setTopCard(curr);
+        for (int i = 0; i < count; i++) {
+            curr->next = new node<card>(card(oCurr->next->nodeValue));
+            curr = curr->next;
+            oCurr = oCurr->next;
+        }
+    }
+    
     return *this;
 }
 
