@@ -57,7 +57,7 @@ card deck::deal() {
 
 void deck::replace(card c) {
     // check range
-    if ((c.getSuit() <= 0 || c.getSuit() >= 3) || (c.getValue() < 1 || c.getValue() > 13)) { // invalid 
+    if ((c.getSuit() < 0 || c.getSuit() > 3) || (c.getValue() < 1 || c.getValue() > 13)) { // invalid 
         throw rangeError("Invalid card input!");
     }
     
