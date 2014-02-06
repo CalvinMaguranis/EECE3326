@@ -49,7 +49,8 @@ ostream& operator<<(ostream &ost, const deck &d) {
 void playFlip() {
     deck d;
     card c;
-    char inp;
+    char inp = 'y';
+    char burnInp;
     bool burn = false;
     int points = 0;
     int count = 0;
@@ -68,13 +69,12 @@ void playFlip() {
 
     // get user input
     cout << "Burn the cards after use? (y/n) ";
-    cin >> inp;
-    if (inp != 'y' && inp != 'n') { throw rangeError("Invalid user input!"); }
+    cin >> burnInp;
+    if (burnInp != 'y' && burnInp != 'n') { throw rangeError("Invalid user input!"); }
 
     // set burn flag
-    if (inp == 'y') { burn = true; }
-    else if (inp == 'n') { burn = false; }
-    inp = 'y';
+    if (burnInp == 'y') { burn = true; }
+    else if (burnInp == 'n') { burn = false; }
 
     while (inp == 'y') {
         // take card
@@ -120,7 +120,7 @@ void playFlip() {
                 cout << "All cards have been taken, shuffling!" << endl;
                 }
         } else {
-            if (!burn && d.getCount() == 0) {
+            if (d.getCount() == 0) {
                 cout << endl << endl << "All cards have been taken!" << endl << endl;
                 break;
             } else {
