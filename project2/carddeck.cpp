@@ -3,15 +3,15 @@
 using namespace std;
 
 deck::deck() {
-	// seed random number generator
-	srand(time(0));
+    // seed random number generator
+    srand(time(0));
 
     setCount(maxDeckSize);
 
     topCard = new node<card>(card(CLUB, 1));
     node<card> *curr = topCard;
 
-	for (int i = 1; i < maxDeckSize; i++) {
+    for (int i = 1; i < maxDeckSize; i++) {
         int cardNum = i%13 + 1;
         SUIT_TYPE s;
 
@@ -27,12 +27,13 @@ deck::deck() {
 }
 
 deck::deck(const deck& d) {
-	// seed random number generator
-	srand(time(0));
+    // seed random number generator
+    srand(time(0));
 
-	if (d.getCount() > maxDeckSize)
-    // perform deep copy on deck cards
-    setCount(d.getCount());
+    //XXX
+    if (d.getCount() > maxDeckSize)
+        // perform deep copy on deck cards
+        setCount(d.getCount());
     if (d.getTopCard() == NULL) {
         setTopCard(NULL);
     } else {
@@ -49,7 +50,7 @@ deck::deck(const deck& d) {
 
 deck::~deck() {
     node<card>* curr = getTopCard();
-	node<card>* tmp;
+    node<card>* tmp;
     for (int i = 0; i < count; i++) {
         tmp = curr;
         curr = curr->next;
@@ -59,7 +60,7 @@ deck::~deck() {
 
 card deck::deal() {
     node<card> *top = getTopCard();
-	if (top == NULL) { throw referenceError("Deck top card uninitialized!"); }
+    if (top == NULL) { throw referenceError("Deck top card uninitialized!"); }
     card c = top->nodeValue;
     setTopCard(top->next);
     setCount(getCount() - 1);
@@ -69,18 +70,19 @@ card deck::deal() {
 }
 
 void deck::replace(card c) {
-	if (c.getSuit() == NULL || c.getValue() == NULL) { 
-		throw rangeError("Invalid card input!"); 
-	}
+    //XXX
+    if (c.getSuit() == NULL || c.getValue() == NULL) {
+        throw rangeError("Invalid card input!");
+    }
     node<card>* prev;
     node<card>* curr = getTopCard();
-	if (curr == NULL) { throw referenceError("Deck top card uninitialized!"); }
+    if (curr == NULL) { throw referenceError("Deck top card uninitialized!"); }
 
-	// search if card already exists in deck,
-	// if the card exists, remove it from it's position in the deck
+    // search if card already exists in deck,
+    // if the card exists, remove it from it's position in the deck
     for (int i = 0; i < count; i++) {
         if (curr->nodeValue.getSuit() == c.getSuit() &&
-            curr->nodeValue.getValue() == c.getValue()) {
+                curr->nodeValue.getValue() == c.getValue()) {
             break;
         } else {
             prev = curr;
@@ -91,7 +93,7 @@ void deck::replace(card c) {
     if (curr == NULL) {
         // reached end of list without finding card
         prev->next = new node<card>(card(c));
-		setCount(getCount() + 1); // added a new card to the deck
+        setCount(getCount() + 1); // added a new card to the deck
     } else {
         // found card in list move it to back
         prev->next = prev->next->next;
@@ -101,32 +103,32 @@ void deck::replace(card c) {
 }
 
 void deck::shuffle() {
-	int count = getCount();
-	int r = 0;
-	card *a = new card[count];
-	card tmp;
-	node<card>* curr;
+    int count = getCount();
+    int r = 0;
+    card *a = new card[count];
+    card tmp;
+    node<card>* curr;
 
-	// check for errors
-	if (count > maxDeckSize) { throw rangeError("Deck size larger than allowed!"); }
-	if (a == NULL) {
-		throw memoryAllocationError("Failed to allocate shuffled value pointer a!");
-	}
+    // check for errors
+    if (count > maxDeckSize) { throw rangeError("Deck size larger than allowed!"); }
+    if (a == NULL) {
+        throw memoryAllocationError("Failed to allocate shuffled value pointer a!");
+    }
 
-	// copy deck cards to pointer array a by value
-	curr = getTopCard();
-	for (int i = 0; i < count; i++) {
-		a[i] = curr->nodeValue;
+    // copy deck cards to pointer array a by value
+    curr = getTopCard();
+    for (int i = 0; i < count; i++) {
+        a[i] = curr->nodeValue;
         curr = curr->next;
     }
 
     // fisher-yates shuffle algorithm on array
     for (int i = 0; i < count; i++) {
-		if (&a[i] == NULL) { 
-			throw indexRangeError(
-				"Attempted to access uninitialized value in the array, fisher-yates shuffle", 
-				i, count);  
-		}
+        if (&a[i] == NULL) {
+            throw indexRangeError(
+                    "Attempted to access uninitialized value in the array, fisher-yates shuffle",
+                    i, count);
+        }
         r = rand() % count;
         tmp = a[r];
         a[r] = a[i];
@@ -134,32 +136,80 @@ void deck::shuffle() {
     }
 
     // copy shuffled values to deck
-	curr = getTopCard();
-	for (int i = 0; i < count; i++) {
-		if (&a[i] == NULL) { // in case anything has changed...
-			throw indexRangeError(
-				"Attempted to access uninitialized value in the array, fisher-yates shuffle",
-				i, count);
-		}
-		curr->nodeValue = a[i];
+    curr = getTopCard();
+    for (int i = 0; i < count; i++) {
+        if (&a[i] == NULL) { // in case anything has changed...
+            throw indexRangeError(
+                    "Attempted to access uninitialized value in the array, fisher-yates shuffle",
+                    i, count);
+        }
+        curr->nodeValue = a[i];
         curr = curr->next;
     }
 
-	delete[] a;
+    delete[] a;
+}
+
+void deck::shuffle2() {
+    int count = getCount();
+    // create pointer array pointing to each node
+    // pointer to pointer so cool
+    node<card>** a = new node<card>*[count];
+
+    // check for errors
+    if (count > maxDeckSize) { throw rangeError("Deck size larger than allowed!"); }
+    if (a == NULL) {
+        throw memoryAllocationError("Failed to allocate memory for pointer array!");
+    }
+
+    // copy node pointers to array
+    node<card>* curr = getTopCard();
+    for (int i = 0; i < count; i++) {
+        a[i] = curr;
+        curr = curr->next;
+    }
+
+    // fisher-yates shuffle algorithm on array
+    for (int i = 0; i < count; i++) {
+        if (a[i] == NULL) {
+            throw indexRangeError(
+                    "Attempted to access uninitialized value in the array, fisher-yates shuffle",
+                    i, count);
+        }
+        int r = rand() % count;
+        node<card>* tmp = a[r];
+        a[r] = a[i];
+        a[i] = tmp;
+    }
+
+    // relink nodes in shuffled order
+    curr = a[0];
+    setTopCard(curr);
+    for (int i = 1; i < count; i++) {
+        if (a[i] == NULL) { // in case anything has changed...
+            throw indexRangeError(
+                    "Attempted to access uninitialized value in the array, fisher-yates shuffle",
+                    i, count);
+        }
+        curr->next = a[i];
+        curr = curr->next;
+    }
+    a[count-1]->next = NULL;
+    delete[] a;
 }
 
 deck& deck::operator=(const deck& d) {
-	if (this == &d) { return *this; }
-
-	this->setCount(d.getCount());
-	this->setTopCard(d.getTopCard());
+    if (this == &d) { return *this; }
+    //XXX Change to do deep copy
+    this->setCount(d.getCount());
+    this->setTopCard(d.getTopCard());
     return *this;
 }
 
 card& card::operator=(const card& c) {
-	if (this == &c) { return *this; }
+    if (this == &c) { return *this; }
 
     this->suit = c.getSuit();
-	this->cardVal = c.getValue();
+    this->cardVal = c.getValue();
     return *this;
 }
