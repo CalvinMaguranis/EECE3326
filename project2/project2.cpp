@@ -117,7 +117,7 @@ void playFlip() {
             if ((count%52)==0) { 
                 d.shuffle2(); 
                 count = 0; 
-                cout << "All cards have been taken, shuffling!" << endl;
+                cout << endl << endl << "All cards have been taken, shuffling the deck!" << endl;
                 }
         } else {
             if (d.getCount() == 0) {
