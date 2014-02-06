@@ -189,7 +189,7 @@ deck& deck::operator=(const deck& d) {
     if (this == &d) { return *this; }
     
     // check for input errors
-    if (d.getCount() > maxDeckSize) { throw rangeException("Deck size is larger than max allowed"); }
+    if (d.getCount() > maxDeckSize) { throw rangeError("Deck size is larger than max allowed"); }
     
     // perform deep copy on deck cards
     setCount(d.getCount());
