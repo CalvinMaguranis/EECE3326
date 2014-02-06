@@ -52,6 +52,7 @@ void playFlip() {
     char inp;
     bool burn = false;
     int points = 0;
+    int count = 0;
 
     // output header
     cout << "Welcome to the game of Flip!" << endl;
@@ -73,8 +74,8 @@ void playFlip() {
     // set burn flag
     if (inp == 'y') { burn = true; }
     else if (inp == 'n') { burn = false; }
+    inp = 'y';
 
-    //XXX
     while (inp == 'y') {
         // take card
         cout << "Drawing card...";
@@ -110,8 +111,15 @@ void playFlip() {
 
         // if not burning the cards, place the
         // top card to the bottom of the deck
-        if (!burn) { d.replace(c); }
-        else {
+        if (!burn) { 
+            d.replace(c); 
+            count++;
+            if ((count%52)==0) { 
+                d.shuffle2(); 
+                count = 0; 
+                cout << "All cards have been taken, shuffling!" << endl;
+                }
+        } else {
             if (!burn && d.getCount() == 0) {
                 cout << endl << endl << "All cards have been taken!" << endl << endl;
                 break;
