@@ -7,12 +7,12 @@
 
 // public enumerations
 enum SUIT_TYPE { CLUB, DIAMOND, HEART, SPADE };
-enum FACE_CARDS { JOKER=0, ACE=1, KING=13, QUEEN=12, JACK=11 };
+enum FACE_CARDS { ACE=1, KING=13, QUEEN=12, JACK=11 };
 
 // card class definition
 class card {
     public:
-		card() : suit(CLUB), cardVal(JOKER) {}
+		card() : suit(CLUB), cardVal(ACE) {}
         card(const SUIT_TYPE s, const int c) : suit(s), cardVal(c) {};
         card(const card& c) : suit(c.getSuit()), cardVal(c.getValue()) {};
 
@@ -37,22 +37,26 @@ class deck {
 
 		// accessors
         node<card> *getTopCard() const { return topCard; }
+		int getCount() const { return count; }
 
 		// public member functions
         card deal();
         void replace(card c);
         void shuffle();
-
+		
 		// operator overloads
 		deck& operator=(const deck& d);
 
     private:
 		// private accessors
-        void setTopCard(node<card>* c) { topCard = c; }
-        int getCount() const { return count; }
-        void setCount(int c) { count = c; }
+        void setTopCard(node<card>* c) { topCard = c; }        
+		void setCount(int c) {
+			if (count > maxDeckSize) { throw rangeError("Invalid deck size!"); }
+			count = c;
+		}
         
-		int count;
+		int count; // current size of the deck
+		static const int maxDeckSize = 52; // maximum size of any card deck
         node<card> *topCard;
 };
 
