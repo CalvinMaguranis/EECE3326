@@ -51,7 +51,6 @@ class wordlist {
         void open(string file);
         string getWord();
 
-    private:
         vector<string> words;
 };
 
@@ -118,13 +117,36 @@ int main() {
     }
 }
 
-void findMatches(vector<string> words, Grid g) {
-    for(std::vector<string>::iterator it = words.begin(); it != words.end(); ++it) {
-        bool found = findWord(*it, g, 0, 0, DIRECTION);
+void findMatches(wordlist words, Grid g) {
+    for(std::vector<string>::iterator it = words.words.begin(); it != words.words.end(); ++it) {
+        bool found = findWord(*it, 0, g, 0, 0, NULL);
         if (found) cout << *it;
     }
 }
 
-bool findWord(string word, Grid g, int row, int col, DIRECTION) {
+bool findWord(string word, int pos, Grid g, int row, int col, DIRECTION) {
+    CHECK if word[pos] != g[row][col] return false
 
+    if at end of word return true
+
+    if (DIRECTION == ANY) {
+        CHECK AJACENT CHARACTERS
+        if (any match ajacent) {
+            findWord(word, pos+1, g, row, col, direction);
+        }
+
+    } else {
+        switch
+            case direction
+                UP
+                    col-- % g.cols()
+                down
+                    col++ % g.cols()
+                left
+                    rows
+                right
+                    rows
+
+        findWord(word, pos+1, g, row, col, direction);
+    }
 }
