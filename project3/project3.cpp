@@ -118,35 +118,80 @@ int main() {
 }
 
 void findMatches(wordlist words, Grid g) {
+    // loop through word list
     for(std::vector<string>::iterator it = words.words.begin(); it != words.words.end(); ++it) {
-        bool found = findWord(*it, 0, g, 0, 0, NULL);
+        bool found = findWord(*it, g);
         if (found) cout << *it;
     }
 }
 
-bool findWord(string word, int pos, Grid g, int row, int col, DIRECTION) {
-    CHECK if word[pos] != g[row][col] return false
+bool findWord(string word, Grid g) {
+    // loop through grid
+    matrix<char> m = g.getMatrix();
+    for (int i = 0; i < m.rows(); i++) {
+        for (int j = 0; j < m.cols(); j++) {
+            bool found = findWordAtPos(word, 0, g, i, j, ANY);
+            if (found) return true;
+        }
+    }
+    return false;
+}
 
-    if at end of word return true
+bool findWordAtPos(string word, int pos, Grid g, int row, int col, DIRECTION) {
+    // check for word at a position
+    matrix<char> m = g.getMatrix();
+    if (word[pos] != m[row][col]) {
+        return false;
+    }
+
+    if (word.length()-1 == pos) {
+        return true;
+    }
 
     if (DIRECTION == ANY) {
-        CHECK AJACENT CHARACTERS
-        if (any match ajacent) {
-            findWord(word, pos+1, g, row, col, direction);
+        //check all adjacent characters
+        bool a = findWord(word, pos+1, g, row-- % m.rows(), col, up);
+        bool b = findWord(word, pos+1, g, row++ % m.rows(), col, down);
+        bool c = findWord(word, pos+1, g, row, col-- % m.cols(), left);
+        bool d = findWord(word, pos+1, g, row, col++ % m.cols(), right);
+        bool e = findWord(word, pos+1, g, row--, col--, up-left);
+        bool f = findWord(word, pos+1, g, row--, col++, up-right);
+        bool g = findWord(word, pos+1, g, row++, col--, down-left);
+        bool h = findWord(word, pos+1, g, row++, col++, down-right);
+        if (a || b || c || d || e || f|| g || h) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        switch {
+            case direction
+                up
+                    col-- % m.cols();
+                    break;
+                down
+                    col++ % m.cols();
+                    break;
+                left
+                    rows-- % m.rows();
+                    break;
+                right
+                    rows++ % m.rows();
+                    break;
+                up-left
+                    rows++ % m.rows();
+                    break;
+                up-right
+                    rows++ % m.rows();
+                    break;
+                down-left
+                    rows++ % m.rows();
+                    break;
+                down-right
+                    rows++ % m.rows();
+                    break;
         }
 
-    } else {
-        switch
-            case direction
-                UP
-                    col-- % g.cols()
-                down
-                    col++ % g.cols()
-                left
-                    rows
-                right
-                    rows
-
-        findWord(word, pos+1, g, row, col, direction);
+        return findWord(word, pos+1, g, row, col, direction);
     }
 }
