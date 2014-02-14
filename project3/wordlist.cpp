@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "d_except.h"
+#include "wordlist.h"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ void wordlist::open(string file) {
     }
 
     while (getline(ifs, word)) {
-        words.push_back(word);
+        list.push_back(word);
     }
 
     ifs.close();

@@ -6,24 +6,18 @@
 
 using namespace std;
 
-Grid::Grid() : m(matrix<char>()) {}
+grid::grid() : m(matrix<char>()) {}
 
-matrix<char> Grid::getMatrix() {
-    return m;
+grid::grid(string file) : m(matrix<char>()) {
+	setMatrix(file);
 }
 
-void Grid::setMatrix(matrix<char> nm) {
-    m = nm;
-}
-
-void Grid::setMatrix(string s) {
+void grid::setMatrix(string s) {
     int rows;
     int cols;
-    ifstream f(s;
 
-    if (!f.is_open()) {
-        throw fileOpenError(s); 
-    }
+	ifstream f(s);
+    if (!f.is_open()) { throw fileOpenError(s); }
 
     f >> rows >> cols;
     m.resize(rows, cols);
@@ -32,6 +26,5 @@ void Grid::setMatrix(string s) {
             f >> m[i][j];
         }
     }
-
     f.close();
 }

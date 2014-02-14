@@ -2,143 +2,200 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <ctime>
 #include "d_matrix.h"
+#include "d_except.h"
 #include "grid.h"
 #include "wordlist.h"
 
 using namespace std;
 
 // to preserve the direction we compare our strings in
-enum DIRECTION { NONE=0, UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
+enum DIRECTION { NONE = 0, UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
 
-// declarations
-bool checkAllNeighbors(Grid, string, int, int, int);
-bool findWord(Grid, string, int, int, int, DIRECTION);
+// forward declarations
+void findMatches(grid g, wordlist words);
+bool findWord(grid g, string word, int pos, int row, int col, DIRECTION d);
+void setDirection(grid g, int &row, int &col, DIRECTION d);
+bool neighbors(grid g, string word, int pos, int row, int col, DIRECTION d);
+int mod(int a, int b);
 
-void findMatches(wordlist words, Grid g) {
-    vector<string> list = words.getDict();
-    matrix<char> m = g.getMatrix();
-    // check every word in the list
-    for(vector<string>::iterator it = list.begin(); it != list.end(); ++it) {
-        bool found = false;
-        // check every row in the matrix
-        for (int row=0; row < m.rows(); row++) {
-            // check every col in the matrix
-            for (int col=0; col< m.cols(); col++) {
-                found = findWord(g, *it, 0, row, col, NONE);
-                if (found) {
-                    cout << *it << endl;
-                    break; // end search
-                }
-            }
-            if (found) { break; }
-        }
-        if (found) { continue; } // go to next word
-    }
-}
-
-bool findWord(Grid g, string word, int pos, int row, int col, DIRECTION d) {
-    // check for word at a position
-    matrix<char> m = g.getMatrix();
-    if (word[pos] != m[row][col]) {
-        return false;
-    }
-
-    if ((int)(word.length()-1) == pos) {
-        return true;
-    }
-
-    if (d == NONE) {
-        //check all adjacent characters
-        return checkAllNeighbors(g, word, pos+1, row, col);
-    } else {
-        switch (d) {
-            case UP:
-                row = (row-1) % m.rows();
-                break;
-            case DOWN:
-                row = (row+1) % m.rows();
-                break;
-            case LEFT:
-                col = (col+1) % m.cols();
-                break;
-            case RIGHT:
-                col = (col-1) % m.cols();
-                break;
-            case UP_LEFT:
-                row = (row-1) % m.rows();
-                col = (col+1) % m.cols();
-                break;
-            case UP_RIGHT:
-                row = (row-1) % m.rows();
-                col = (col-1) % m.cols();
-                break;
-            case DOWN_LEFT:
-                row = (row+1) % m.rows();
-                col = (col+1) % m.cols();
-                break;
-            case DOWN_RIGHT:
-                row = (row+1) % m.rows();
-                col = (col-1) % m.cols();
-                break;
-            default:
-                //Error
-                cout << "This shouldn't happen";
-        }
-
-        return findWord(g, word, pos+1, row, col, d);
-    }
-}
-
-bool checkAllNeighbors(Grid g, string word, int pos, int row, int col) {
-    //check all adjacent characters
-    matrix<char> m = g.getMatrix();
-    //TODO: The rows and cols need to be modulated still
-    bool a = findWord(g, word, pos+1, row--, col, UP);
-    bool b = findWord(g, word, pos+1, row++, col, DOWN);
-    bool c = findWord(g, word, pos+1, row, col--, LEFT);
-    bool d = findWord(g, word, pos+1, row, col++, RIGHT);
-    bool e = findWord(g, word, pos+1, row--, col--, UP_LEFT);
-    bool f = findWord(g, word, pos+1, row--, col++, UP_RIGHT);
-    bool h = findWord(g, word, pos+1, row++, col--, DOWN_LEFT);
-    bool i = findWord(g, word, pos+1, row++, col++, DOWN_RIGHT);
-    if (a || b || c || d || e || f || h || i) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/*
 int main() {
     try {
-        string word;
-        wordlist mlist("wordlist.txt");
-        while (word != "1") {
-            word = mlist.getWord();
-            if (word != "1") { cout << word << endl; }
-        }
+		clock_t begin;
+		clock_t end;
 
+		cout << "loading word list...";
+		begin = clock();
+        wordlist list("wordlist.txt");
+		end = clock();
+		cout << "completed (" << (end - begin) << ")" << endl;
+
+		cout << "loading word matrix...";
+		begin = clock();
+		grid g("input15.txt");
+		end = clock();
+		cout << "completed (" << end - begin << ")" << endl;
+
+		cout << "Starting search...";
+		begin = clock();
+		findMatches(g, list);
+		end = clock();
+		cout << "completed (" << end - begin << ")" << endl;
     } catch (fileOpenError &ex) {
         cout << ex.what() << endl;
     } catch (underflowError &ex) {
         cout << ex.what() << endl;
+	}
+	catch (rangeError &ex) {
+		cout << ex.what() << endl;
+	} catch (expressionError &ex) {
+		cout << ex.what() << endl;
     } catch (...) {
         cout << "unknown exception" << endl;
     }
 
+	system("PAUSE");
     return 0;
 }
-*/
 
-int main() {
-    Grid g;
-    g.setMatrix("input15.txt");
-    matrix<char> m = g.getMatrix();
-    for (int i = 0; i < m.rows(); i++) {
-        for (int j = 0; j < m.cols(); j++) {
-            cout << m[i][j] << " ";
-        }
-        cout << "\n";
-    }
+void findMatches(grid g, wordlist words) {
+	vector<string> list = words.getList();
+	bool found = false;
+
+	for (vector<string>::iterator it = list.begin(); it != list.end(); ++it) {
+		// access every word in the list
+		for (int row = 0; row<g.getMatrix().rows(); row++) {
+			// check every row in the matrix
+			for (int col = 0; col<g.getMatrix().cols(); col++) {
+				// and every column in the matrix
+				found = findWord(g, *it, 0, row, col, NONE);
+				if (found) {
+					cout << *it << endl;
+					break; // end search
+				}
+			}
+			if (found) { break; } // break again...
+		}
+		if (found) { break; } // go to next word
+	}
+}
+
+bool findWord(grid g, string word, int pos, int row, int col, DIRECTION d) {
+	// check base cases
+	if (word[pos] != g.getMatrix()[row][col]) {
+		// mismatch found, continue to next row, col
+		return false;
+	}
+	if ((word.size() == pos) && (word[pos] != g.getMatrix()[row][col])) {
+		// if we are at the last word
+		return true;
+	}
+
+	if (d == NONE) {
+		return neighbors(g, word, (pos + 1), row, col, d);
+	}
+	else {
+		setDirection(g, row, col, d);
+	}
+	// go until we hit a base case
+	return findWord(g, word, (pos + 1), row, col, d);
+}
+
+void setDirection(grid g, int &row, int &col, DIRECTION d) {
+	switch (d) {
+	case UP_LEFT:
+		row = mod((row-1), g.getMatrix().rows());
+		col = mod((col-1), g.getMatrix().cols());
+		break;
+	case UP:
+		row = mod((row-1), g.getMatrix().rows());
+		col = mod(col, g.getMatrix().cols());
+		break;
+	case UP_RIGHT:
+		row = mod((row-1), g.getMatrix().rows());
+		col = mod((col+1), g.getMatrix().cols());
+		break;
+	case LEFT:
+		row = mod(row, g.getMatrix().rows());
+		col = mod((col-1), g.getMatrix().cols());
+		break;
+	case RIGHT:
+		row = mod(row, g.getMatrix().rows());
+		col = mod((col+1), g.getMatrix().cols());
+		break;
+	case DOWN_LEFT:
+		row = mod((row+1), g.getMatrix().rows());
+		col = mod((col-1), g.getMatrix().cols());
+		break;
+	case DOWN:
+		row = mod((row+1), g.getMatrix().rows());
+		col = mod(col, g.getMatrix().cols());
+		break;
+	case DOWN_RIGHT:
+		row = mod((row+1), g.getMatrix().rows());
+		col = mod((col+1), g.getMatrix().cols());
+		break;
+	default:
+		throw rangeError("A direction should be defined, logic/input corruption");
+		break;
+	}
+}
+
+bool neighbors(grid g, string word, int pos, int row, int col, DIRECTION d) {
+	// check ALL neighbors for the next char, 
+	// there could be multiple chars of the same value
+	if (findWord(g, word, pos,
+		mod((row-1), g.getMatrix().rows()), mod((col-1), g.getMatrix().cols()),
+		UP_LEFT)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod((row-1), g.getMatrix().rows()), mod(col, g.getMatrix().cols()),
+		UP)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod((row-1), g.getMatrix().rows()), mod((col+1), g.getMatrix().cols()),
+		UP_RIGHT)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod(row, g.getMatrix().rows()), mod((col-1), g.getMatrix().cols()),
+		LEFT)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod(row, g.getMatrix().rows()), mod((col+1), g.getMatrix().cols()),
+		RIGHT)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod((row+1), g.getMatrix().rows()), mod((col-1), g.getMatrix().cols()),
+		DOWN_LEFT)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod((row+1), g.getMatrix().rows()), mod(col, g.getMatrix().cols()),
+		DOWN)) {
+		return true;
+	}
+	if (findWord(g, word, pos,
+		mod((row+1), g.getMatrix().rows()), mod((col+1), g.getMatrix().cols()),
+		DOWN_RIGHT)) {
+		return true;
+	}
+	// none of the neighbors matched the word
+	return false;
+}
+
+// helper wrap-around modulus function, from:
+// http://stackoverflow.com/questions/4003232/how-to-code-a-modulo-operator-in-c-c-obj-c-that-handles-negative-numbers?rq=1
+int mod(int a, int b)
+{
+	if (b == 0) { throw expressionError("Cannot perform modulus by 0!"); }
+	if (b < 0) { return mod(-a, -b); }
+	int ret = a % b;
+	if (ret < 0) { ret += b; }
+	return ret;
 }
