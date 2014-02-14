@@ -11,7 +11,7 @@ class wordlist {
         wordlist(string file);
 
         void open(string file);
-        vector<string> wordlist::getList() { return list; }
+        vector<string> getList() { return list; }
     private:
         vector<string> list;
 };

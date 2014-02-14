@@ -1,7 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
 #include "d_except.h"
 #include "wordlist.h"
 
@@ -18,8 +16,8 @@ void wordlist::open(string file) {
     fstream ifs(file);
     string word;
 
-    if (!ifs.is_open()) { 
-        throw fileOpenError(file); 
+    if (!ifs.is_open()) {
+        throw fileOpenError(file);
     }
 
     while (getline(ifs, word)) {
