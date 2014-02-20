@@ -12,8 +12,12 @@ class wordlist {
 
         void open(string file);
         vector<string> getList() { return list; }
+        vector<string> getValid() { return valid; }
+        const int getMinWordSize() { return minWordSize; }
     private:
         vector<string> list;
+        vector<string> valid;
+        const int minWordSize;
 };
 
 
