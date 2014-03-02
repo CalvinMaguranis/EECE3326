@@ -22,7 +22,7 @@ class matrix
    // Precondition: 0 <= i < nRows. a violation of this
    // precondition throws the indexRangeError exception.
    // Postcondition: if the operator is used on the left-hand
-   // side of an assignment statement, an element of row i 
+   // side of an assignment statement, an element of row i
    // is changed
 
    const vector<T>& operator[](int i) const;
@@ -38,6 +38,8 @@ class matrix
    // Postcondition: the matrix has size numRows x numCols.
    // any new elements are filled with the default value of type T
 
+   const vector< vector<T> > getMat() { return mat; }
+
   private:
    int nRows, nCols;
    // number of rows and columns
@@ -49,8 +51,8 @@ class matrix
 
 template <typename T>
 matrix<T>::matrix(int numRows, int numCols, const T& initVal):
-	nRows(numRows), nCols(numCols),
-	mat(numRows, vector<T>(numCols,initVal))
+    nRows(numRows), nCols(numCols),
+    mat(numRows, vector<T>(numCols,initVal))
 {}
 
 // non-constant version. provides general access to matrix
@@ -60,7 +62,7 @@ vector<T>& matrix<T>::operator[] (int i)
 {
    if (i < 0 || i >= nRows)
       throw indexRangeError(
-	 "matrix: invalid row index", i, nRows);
+     "matrix: invalid row index", i, nRows);
 
    return mat[i];
 }
@@ -72,7 +74,7 @@ const vector<T>& matrix<T>::operator[] (int i) const
 {
    if (i < 0 || i >= nRows)
       throw indexRangeError(
-	 "matrix: invalid row index", i, nRows);
+     "matrix: invalid row index", i, nRows);
 
    return mat[i];
 }
@@ -93,7 +95,7 @@ template <typename T>
 void matrix<T>::resize(int numRows, int numCols)
 {
    int i;
-   
+
    // handle case of no size change with a return
    if (numRows == nRows && numCols == nCols)
       return;
@@ -110,4 +112,4 @@ void matrix<T>::resize(int numRows, int numCols)
       mat[i].resize(nCols);
 }
 
-#endif	// MATRIX_CLASS
+#endif  // MATRIX_CLASS
