@@ -39,12 +39,12 @@ void maze::setMap(int i, int j, int n)
 {
 }
 
-int maze ::getMap(int i, int j) const
-// Return mapping of maze cell (i,j) in the graph.
+int maze::getMap(int i, int j) const
+// Return graph node at maze cell (i,j).
 {
 }
 
-int maze ::getMazeCoordinates(int n, int &i, int &j) const
+int maze::getMazeCoordinates(int n, int &i, int &j) const
 // Return reverse mapping of node n to it's maze i value.
 {
 }
@@ -115,6 +115,14 @@ bool maze::isLegal(int i, int j)
 void maze::mapMazeToGraph(graph &g)
 // Create a graph g that represents the legal moves in the maze m.
 {
+   int n = 0;
+   for (int i=0; i<rows; i++) {
+      for (int j=0; j<cols; j++) {
+         if (matrix[i][j]) {
+            setMap(i, j, n++);
+         }
+      }
+   }
 }
 
 int main()
