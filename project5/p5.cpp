@@ -23,8 +23,7 @@ class maze
 
       void setMap(int i, int j, int n);
       int getMap(int i, int j) const;
-      int getReverseMapI(int n) const;
-      int getReverseMapJ(int n) const;
+      int getMazeCoordinates(int, int &, int &) const
 
       void mapMazeToGraph(graph &g);
 
@@ -45,13 +44,8 @@ int maze ::getMap(int i, int j) const
 {
 }
 
-int maze ::getReverseMapI(int n) const
+int maze ::getMazeCoordinates(int n, int &i, int &j) const
 // Return reverse mapping of node n to it's maze i value.
-{
-}
-
-int maze ::getReverseMapJ(int n) const
-// Return reverse mapping of node n to it's maze j value.
 {
 }
 
