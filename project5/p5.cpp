@@ -3,6 +3,7 @@
 #include <list>
 #include <map>
 #include <fstream>
+#include <stack>
 #include "d_matrix.h"
 #include "d_except.h"
 #include "graph.h"
@@ -101,6 +102,12 @@ void maze::print(int goalI, int goalJ, int currI, int currJ) const
         throw rangeError("Bad value in maze::print");
     }
 
+	cout << "+";
+	for (int j = 0; j <= cols - 3; j++) {
+		cout << "=";
+	}
+	cout << "+" << endl;
+
     for (int i = 0; i <= rows - 1; i++) {
         for (int j = 0; j <= cols - 1; j++) {
             if (i == goalI && j == goalJ) {
@@ -115,7 +122,13 @@ void maze::print(int goalI, int goalJ, int currI, int currJ) const
         }
         cout << endl;
     }
-    cout << endl;
+	cout << "+";
+	for (int j = 0; j <= cols - 3; j++) {
+		cout << "=";
+	}
+	cout << "+" << endl;
+
+	cout << endl;
 }
 
 bool maze::isLegal(int i, int j) const
@@ -152,6 +165,7 @@ void maze::mapMazeToGraph(graph &g)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             if (val[i][j]) {
+
                 int x = getNodeForCoord(i, j);
                 if ((i-1) >= 0 && val[i-1][j]) {
                     int y = getNodeForCoord(i-1, j);
@@ -177,26 +191,92 @@ void maze::mapMazeToGraph(graph &g)
     }
 }
 
+
+bool findPath_rec(graph &g, maze &m, int pos) {
+	int row, col;
+	m.getCoordForNode(pos, row, col);
+	g.visit(pos);
+	m.print(m.numRows() - 1, m.numCols() - 1, row, col);
+	if (row == m.numRows() - 1 && col == m.numCols() - 1) {
+		return true;
+	} else {
+		for (int n = 0; n < g.numNodes(); n++) {
+			if (g.isEdge(pos, n)) {
+				if (g.isVisited(n) == false) { // neighbor is unvisited
+					if (findPath_rec(g, m, n)) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool findPath_it(graph &g, maze &m, int node) {
+	stack<int> s;
+	s.push(node);
+	while (s.empty() == false) {
+		int v, row, col;
+		v = s.top();
+		s.pop();
+		m.getCoordForNode(v, row, col);
+		m.print(m.numRows() - 1, m.numCols() - 1, row, col);
+		if (row == m.numRows() - 1 && col == m.numCols() - 1) {
+			return true; // found the end
+		} else {
+			if (g.isVisited(v) == false) {
+				g.visit(v);
+				for (int n = 0; n < g.numNodes(); n++) {
+					if (g.isEdge(v, n)) {
+						if (g.isVisited(n) == false) { s.push(n); }
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 int main() {
     ifstream fin;
 
     // Read the maze from the file.
-    string fileName = "maze.txt";
+    string fileName = "maze1.txt";
 
     fin.open(fileName.c_str());
     if (!fin) {
         cerr << "Cannot open " << fileName << endl;
+		system("PAUSE");
         exit(1);
     }
 
     try {
         graph g;
-        while (fin && fin.peek() != 'Z') {
-            maze m(fin);
+		if (fin && fin.peek() != 'Z') {
+			maze m(fin);
+			m.mapMazeToGraph(g);
+
+			if (findPath_rec(g, m, 0) == false) {
+				cout << "No path exists" << endl;
+			}
+			/*
+			if (findPath_it(g, m, 0) == false) {
+				cout << "No path exists" << endl;
+			}
+			*/
         }
+
     } catch (indexRangeError &ex) {
-        cout << ex.what() << endl; exit(1);
+        cout << ex.what() << endl; 
+		system("PAUSE"); 
+		exit(1);
     } catch (rangeError &ex) {
-        cout << ex.what() << endl; exit(1);
+        cout << ex.what() << endl; 
+		system("PAUSE"); 
+		exit(1);
     }
+
+	system("PAUSE");
 }
