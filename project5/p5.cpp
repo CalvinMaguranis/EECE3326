@@ -41,20 +41,20 @@ class maze {
 };
 
 void maze::setMapping(int i, int j, int n)
-    // Set mapping from maze coordinate (i,j) to graph node n.
+// Set mapping from maze coordinate (i,j) to graph node n.
 {
     coord2Node[i][j] = n;
     node2Coord[n] = pair<int, int>(i, j);
 }
 
 int maze::getNodeForCoord(int i, int j) const
-    // Return graph node at maze coordinate (i,j).
+// Return graph node at maze coordinate (i,j).
 {
     return coord2Node[i][j];
 }
 
 void maze::getCoordForNode(int n, int &i, int &j)
-    // Return mapping of node n to it's maze coordinate.
+// Return mapping of node n to it's maze coordinate.
 {
     pair<int, int> p = node2Coord[n];
     i = p.first;
@@ -62,8 +62,8 @@ void maze::getCoordForNode(int n, int &i, int &j)
 }
 
 maze::maze(ifstream &fin)
-    // Initializes a maze by reading values from fin.  Assumes that the
-    // number of rows and columns indicated in the file are correct.
+// Initializes a maze by reading values from fin.  Assumes that the
+// number of rows and columns indicated in the file are correct.
 {
     fin >> rows;
     fin >> cols;
@@ -89,8 +89,8 @@ maze::maze(ifstream &fin)
 }
 
 void maze::print(int goalI, int goalJ, int currI, int currJ) const
-    // Print out a maze, with the goal and current cells marked on the
-    // board.
+// Print out a maze, with the goal and current cells marked on the
+// board.
 {
     cout << endl;
 
@@ -102,11 +102,11 @@ void maze::print(int goalI, int goalJ, int currI, int currJ) const
         throw rangeError("Bad value in maze::print");
     }
 
-	cout << "+";
-	for (int j = 0; j <= cols - 3; j++) {
-		cout << "=";
-	}
-	cout << "+" << endl;
+    cout << "+";
+    for (int j = 0; j <= cols - 3; j++) {
+        cout << "=";
+    }
+    cout << "+" << endl;
 
     for (int i = 0; i <= rows - 1; i++) {
         for (int j = 0; j <= cols - 1; j++) {
@@ -122,18 +122,18 @@ void maze::print(int goalI, int goalJ, int currI, int currJ) const
         }
         cout << endl;
     }
-	cout << "+";
-	for (int j = 0; j <= cols - 3; j++) {
-		cout << "=";
-	}
-	cout << "+" << endl;
+    cout << "+";
+    for (int j = 0; j <= cols - 3; j++) {
+        cout << "=";
+    }
+    cout << "+" << endl;
 
-	cout << endl;
+    cout << endl;
 }
 
 bool maze::isLegal(int i, int j) const
-    // Return the value stored at the (i,j) entry in the maze, indicating
-    // whether it is legal to occupy cell (i,j).
+// Return the value stored at the (i,j) entry in the maze, indicating
+// whether it is legal to occupy cell (i,j).
 {
     if (i < 0 || i > rows || j < 0 || j > cols) {
         throw rangeError("Bad value in maze::isLegal");
@@ -143,7 +143,7 @@ bool maze::isLegal(int i, int j) const
 }
 
 void maze::mapMazeToGraph(graph &g)
-    // Create a graph g that represents the legal moves in the maze m.
+// Create a graph g that represents the legal moves in the maze m.
 {
     coord2Node.resize(rows,cols);
 
@@ -192,91 +192,134 @@ void maze::mapMazeToGraph(graph &g)
 }
 
 
-bool findPath_rec(graph &g, maze &m, int pos) {
-	int row, col;
-	m.getCoordForNode(pos, row, col);
-	g.visit(pos);
-	m.print(m.numRows() - 1, m.numCols() - 1, row, col);
-	if (row == m.numRows() - 1 && col == m.numCols() - 1) {
-		return true;
-	} else {
-		for (int n = 0; n < g.numNodes(); n++) {
-			if (g.isEdge(pos, n)) {
-				if (g.isVisited(n) == false) { // neighbor is unvisited
-					if (findPath_rec(g, m, n)) {
-						return true;
-					}
-				}
-			}
-		}
-	}
-	return false;
+bool findPathRec(graph &g, maze &m, int pos) {
+    int row, col;
+    m.getCoordForNode(pos, row, col);
+    g.visit(pos);
+    m.print(m.numRows() - 1, m.numCols() - 1, row, col);
+    if (row == m.numRows() - 1 && col == m.numCols() - 1) {
+        return true;
+    } else {
+        for (int n = 0; n < g.numNodes(); n++) {
+            if (g.isEdge(pos, n)) {
+                if (g.isVisited(n) == false) { // neighbor is unvisited
+                    if (findPathRec(g, m, n)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
-bool findPath_it(graph &g, maze &m, int node) {
-	stack<int> s;
-	s.push(node);
-	while (s.empty() == false) {
-		int v, row, col;
-		v = s.top();
-		s.pop();
-		m.getCoordForNode(v, row, col);
-		m.print(m.numRows() - 1, m.numCols() - 1, row, col);
-		if (row == m.numRows() - 1 && col == m.numCols() - 1) {
-			return true; // found the end
-		} else {
-			if (g.isVisited(v) == false) {
-				g.visit(v);
-				for (int n = 0; n < g.numNodes(); n++) {
-					if (g.isEdge(v, n)) {
-						if (g.isVisited(n) == false) { s.push(n); }
-					}
-				}
-			}
-		}
-	}
+bool findPathIt(graph &g, maze &m, int node) {
+    stack<int> s;
+    s.push(node);
+    while (s.empty() == false) {
+        int v, row, col;
+        v = s.top();
+        s.pop();
+        m.getCoordForNode(v, row, col);
+        m.print(m.numRows() - 1, m.numCols() - 1, row, col);
+        if (row == m.numRows() - 1 && col == m.numCols() - 1) {
+            return true; // found the end
+        } else {
+            if (g.isVisited(v) == false) {
+                g.visit(v);
+                for (int n = 0; n < g.numNodes(); n++) {
+                    if (g.isEdge(v, n)) {
+                        if (g.isVisited(n) == false) { s.push(n); }
+                    }
+                }
+            }
+        }
+    }
 
-	return false;
+    return false;
+}
+
+void shortestPathDFS(graph &g, vector<int> &sol, vector<int> &currentPath,
+                     int currentNode, int endNode) {
+    g.visit(currentNode);
+    currentPath.push_back(currentNode);
+    if (currentNode == endNode) {
+        if ((currentPath.size() < sol.size()) || sol.size() == 0) {
+            sol = currentPath;
+        }
+        return;
+    }
+
+    for (int n = 0; n < g.numNodes(); n++) {
+        if (g.isEdge(currentNode, n)) {
+            if (g.isVisited(n) == false) { // neighbor is unvisited
+                shortestPathDFS(g, sol, currentPath, n, endNode);
+                g.unVisit(n);
+                currentPath.pop_back();
+            }
+        }
+    }
+}
+
+void findShortestPathDFS(graph &g, maze &m) {
+    int endI = m.numRows() - 1;
+    int endJ = m.numCols() - 1;
+    int startNode = m.getNodeForCoord(0, 0);
+    int endNode = m.getNodeForCoord(endI, endJ);
+    vector<int> currentPath;
+    vector<int> sol;
+    shortestPathDFS(g, sol, currentPath, startNode, endNode);
+    for (vector<int>::iterator it = sol.begin(); it != sol.end(); it++) {
+        int i, j;
+        int n = *it;
+        m.getCoordForNode(n ,i , j);
+        m.print(endI, endJ, i, j);
+    }
+}
+
+void findShortestPathBFS(graph &g, maze &m) {
+
 }
 
 int main() {
     ifstream fin;
 
     // Read the maze from the file.
-    string fileName = "maze1.txt";
+    string fileName = "maze.txt";
 
     fin.open(fileName.c_str());
     if (!fin) {
         cerr << "Cannot open " << fileName << endl;
-		system("PAUSE");
+        system("PAUSE");
         exit(1);
     }
 
     try {
         graph g;
-		if (fin && fin.peek() != 'Z') {
-			maze m(fin);
-			m.mapMazeToGraph(g);
+        if (fin && fin.peek() != 'Z') {
+            maze m(fin);
+            m.mapMazeToGraph(g);
+            findShortestPathDFS(g, m);
 
-			if (findPath_rec(g, m, 0) == false) {
-				cout << "No path exists" << endl;
-			}
-			/*
-			if (findPath_it(g, m, 0) == false) {
-				cout << "No path exists" << endl;
-			}
-			*/
+            /*
+               if (findPath_rec(g, m, 0) == false) {
+               cout << "No path exists" << endl;
+               }
+               if (findPath_it(g, m, 0) == false) {
+               cout << "No path exists" << endl;
+               }
+               */
         }
 
     } catch (indexRangeError &ex) {
-        cout << ex.what() << endl; 
-		system("PAUSE"); 
-		exit(1);
+        cout << ex.what() << endl;
+        system("PAUSE");
+        exit(1);
     } catch (rangeError &ex) {
-        cout << ex.what() << endl; 
-		system("PAUSE"); 
-		exit(1);
+        cout << ex.what() << endl;
+        system("PAUSE");
+        exit(1);
     }
 
-	system("PAUSE");
+    system("PAUSE");
 }
