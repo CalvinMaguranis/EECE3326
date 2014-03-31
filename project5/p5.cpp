@@ -4,6 +4,7 @@
 #include <map>
 #include <fstream>
 #include <stack>
+#include <queue>
 #include "d_matrix.h"
 #include "d_except.h"
 #include "graph.h"
@@ -192,18 +193,20 @@ void maze::mapMazeToGraph(graph &g)
 }
 
 
-bool findPathRec(graph &g, maze &m, int pos) {
+bool findPathRec(graph &g, maze &m, int pos, bool print) {
     int row, col;
     m.getCoordForNode(pos, row, col);
     g.visit(pos);
-    m.print(m.numRows() - 1, m.numCols() - 1, row, col);
+	if (print) {
+		m.print(m.numRows() - 1, m.numCols() - 1, row, col);
+	}
     if (row == m.numRows() - 1 && col == m.numCols() - 1) {
         return true;
     } else {
         for (int n = 0; n < g.numNodes(); n++) {
             if (g.isEdge(pos, n)) {
                 if (g.isVisited(n) == false) { // neighbor is unvisited
-                    if (findPathRec(g, m, n)) {
+                    if (findPathRec(g, m, n, print)) {
                         return true;
                     }
                 }
@@ -241,6 +244,10 @@ bool findPathIt(graph &g, maze &m, int node) {
 
 void shortestPathDFS(graph &g, vector<int> &sol, vector<int> &currentPath,
                      int currentNode, int endNode) {
+	if (sol.size() > g.numNodes() || currentPath.size() > g.numNodes()) {
+		// cannot find the end, graph is unconnected to endNode
+		return;
+	}
     g.visit(currentNode);
     currentPath.push_back(currentNode);
     if (currentNode == endNode) {
@@ -266,26 +273,87 @@ void findShortestPathDFS(graph &g, maze &m) {
     int endJ = m.numCols() - 1;
     int startNode = m.getNodeForCoord(0, 0);
     int endNode = m.getNodeForCoord(endI, endJ);
-    vector<int> currentPath;
-    vector<int> sol;
-    shortestPathDFS(g, sol, currentPath, startNode, endNode);
-    for (vector<int>::iterator it = sol.begin(); it != sol.end(); it++) {
-        int i, j;
-        int n = *it;
-        m.getCoordForNode(n ,i , j);
-        m.print(endI, endJ, i, j);
-    }
+    
+	if (findPathRec(g, m, startNode, false)) {
+		vector<int> currentPath;
+		vector<int> sol;
+		g.clearVisit();
+		shortestPathDFS(g, sol, currentPath, startNode, endNode);
+
+		cout << "DFS: solution found:" << endl;
+		for (vector<int>::iterator it = sol.begin(); it != sol.end(); it++) {
+		int i, j;
+		int n = *it;
+		m.getCoordForNode(n ,i , j);
+		m.print(endI, endJ, i, j);
+		}
+		cout << endl;
+		cout << "Total steps : " << sol.size() - 1 << endl;
+	} else {
+		// cannot find the end, graph is unconnected to endNode
+		cout << "DFS: cannot find path to end" << endl;
+	}
 }
 
 void findShortestPathBFS(graph &g, maze &m) {
+	queue<int> q;
+	map<int, int> pred; // node, pred
+	int endI = m.numRows() - 1;
+	int endJ = m.numCols() - 1;
+	int startNode = m.getNodeForCoord(0, 0);
+	int endNode = m.getNodeForCoord(endI, endJ);
+	g.clearVisit();
+	q.push(startNode);
+	pred[startNode] = -1; // only starnode has no predecessor
 
+	while (q.empty() == false) {
+		int v;
+		v = q.front();
+		q.pop();
+		if (g.isVisited(v) == false) {
+			g.visit(v);
+			for (int n = 0; n < g.numNodes(); n++) {
+				if (g.isEdge(v, n)) {
+					if (g.isVisited(n) == false) { 
+						q.push(n); 
+						pred[n] = v;
+					}
+				}
+			}
+		}
+	}
+
+	// check if we got to the end
+	if (findPathRec(g, m, startNode, false)) {
+		cout << "BFS: solution found:" << endl;
+		int node = endNode, count = -1;
+		stack<int> s;
+		s.push(node);
+
+		while (node != startNode) {
+			node = s.top();
+			s.push(pred[node]);
+			count++;
+		}
+		s.pop(); // startNode has no predecessor
+		int i, j, n;
+		while (!s.empty()) {
+			m.getCoordForNode(s.top(), i, j);
+			m.print(endI, endJ, i, j);
+			s.pop();
+		}
+		cout << endl;
+		cout << "Total steps : " << count << endl;
+	} else {
+		cout << "BFS: cannot find path to end" << endl;
+	}
 }
 
 int main() {
     ifstream fin;
 
     // Read the maze from the file.
-    string fileName = "maze.txt";
+    string fileName = "maze1.txt";
 
     fin.open(fileName.c_str());
     if (!fin) {
@@ -299,16 +367,10 @@ int main() {
         if (fin && fin.peek() != 'Z') {
             maze m(fin);
             m.mapMazeToGraph(g);
-            findShortestPathDFS(g, m);
-
-            /*
-               if (findPath_rec(g, m, 0) == false) {
-               cout << "No path exists" << endl;
-               }
-               if (findPath_it(g, m, 0) == false) {
-               cout << "No path exists" << endl;
-               }
-               */
+          
+			findShortestPathDFS(g, m);
+			findShortestPathBFS(g, m);
+			
         }
 
     } catch (indexRangeError &ex) {
