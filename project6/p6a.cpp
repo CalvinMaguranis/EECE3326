@@ -15,26 +15,20 @@
 
 using namespace std;
 
-int const NONE = -1;  // Used to represent a node that does not exist
-
-
-void dfs(graph &g, graph &sf, int val, bool &cyclic) {
-    int v = val; // start node
-    int count = 0;
+void dfs(graph &g, graph &sf, bool &cyclic, int v, int x) {
     g.visit(v);
+    int count = 0;
     for (int w = 0; w < g.numNodes(); w++) {
         if (g.isEdge(v, w)) {
             if (g.isVisited(w)) {
                 count++;
             } else {
-                cout <<  "dfs v: " << v << " w: " << w << " numNodes(): " << sf.numNodes() << endl;
-                node n = g.getNode(w);
-                sf.addNode(n);
-                sf.addEdge(v, w);
-
-                dfs(g, sf, w, cyclic);
+                int y = sf.addNode();
+                sf.addEdge(x, y);
+                dfs(g, sf, cyclic, w, y);
             }
         }
+
         if (count > 1) {
             cyclic = true;
         }
@@ -44,56 +38,43 @@ void dfs(graph &g, graph &sf, int val, bool &cyclic) {
 // Returns true if the graph g contains a cycle.  Otherwise, returns false.
 bool isCyclic(graph &g) {
     graph d;
-    bool ret = false;
-
+    bool cyclic = false;
     for (int i = 0; i < g.numNodes(); i++) {
         if (g.isVisited(i) == false) {
-            node v;
-            v.setNode(i, 0, false, false);
-            d.addNode(v);
-
-            dfs(g, d, i, ret);
-            if (ret) {
-                return ret;
+            int x = d.addNode();
+            dfs(g, d, cyclic, i, x);
+            if (cyclic) {
+                break;
             }
         }
     }
-    return ret;
+    g.clearVisit();
+    return cyclic;
 }
 
 // Returns true if the graph g is connected.  Otherwise returns false.
 bool isConnected(graph &g) {
-    bool whatever = false;
-    graph c(1);
-
-    dfs(g, c, 0, whatever);
-
-    if (g.numNodes() != c.numNodes()) {
-        return false;
-    }
-    return true;
+    bool cyclic = false;
+    graph d(1);
+    dfs(g, d, cyclic, 0, 0);
+    g.clearVisit();
+    return (g.numNodes() == d.numNodes());
 }
 
 // Create a graph sf that contains a spanning forest on the graph g.
 void findSpanningForest(graph &g, graph &sf) {
-    bool whatever = false;
-
+    bool cyclic = false;
     for (int i = 0; i < g.numNodes(); i++) {
         if (g.isVisited(i) == false) {
             // new spanning tree can be generated
-            node v;
-            v.setNode(i, 0, false, false);
-            sf.addNode(v);
-
-            cout << "sf size: " << sf.numNodes() << endl;
-
-            dfs(g, sf, i, whatever);
+            int x = sf.addNode();
+            dfs(g, sf, cyclic, i, x);
         }
     }
+    g.clearVisit();
 }
 
 int main() {
-    char x;
     ifstream fin;
     stack <int> moves;
     string fileName;
@@ -101,10 +82,7 @@ int main() {
     // Read the name of the graph from the keyboard or
     // hard code it here for testing.
 
-    fileName = "graph2.txt";
-
-    //   cout << "Enter filename" << endl;
-    //   cin >> fileName;
+    fileName = "graph4.txt";
 
     fin.open(fileName.c_str());
     if (!fin) {
@@ -143,7 +121,8 @@ int main() {
         cout << "Finding spanning forest" << endl;
 
         // Initialize an empty graph to contain the spanning forest
-        graph sf(g.numNodes());
+        //graph sf(g.numNodes());
+        graph sf;
         findSpanningForest(g, sf);
 
         cout << endl;
