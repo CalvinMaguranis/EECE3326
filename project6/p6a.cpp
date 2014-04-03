@@ -17,97 +17,161 @@ using namespace std;
 
 int const NONE = -1;  // Used to represent a node that does not exist
 
-bool isCyclic(graph &g)
+
+void dfs(graph &g, graph &sf, int val, bool &cyclic) {
+    int v = val; // start node
+    int count = 0;
+    g.visit(v);
+    for (int w = 0; w < g.numNodes(); w++) {
+        if (g.isEdge(v, w)) {
+            if (g.isVisited(w)) {
+                count++;
+            } else {
+                cout <<  "dfs v: " << v << " w: " << w << " numNodes(): " << sf.numNodes() << endl;
+                node n = g.getNode(w);
+                sf.addNode(n);
+                sf.addEdge(v, w);
+
+                dfs(g, sf, w, cyclic);
+            }
+        }
+        if (count > 1) {
+            cyclic = true;
+        }
+    }
+}
+
 // Returns true if the graph g contains a cycle.  Otherwise, returns false.
+bool isCyclic(graph &g) {
+    graph d;
+    bool ret = false;
 
-void findSpanningForest(graph &g, graph &sf)
-// Create a graph sf that contains a spanning forest on the graph g.  
+    for (int i = 0; i < g.numNodes(); i++) {
+        if (g.isVisited(i) == false) {
+            node v;
+            v.setNode(i, 0, false, false);
+            d.addNode(v);
 
-bool isConnected(graph &g)
+            dfs(g, d, i, ret);
+            if (ret) {
+                return ret;
+            }
+        }
+    }
+    return ret;
+}
+
 // Returns true if the graph g is connected.  Otherwise returns false.
+bool isConnected(graph &g) {
+    bool whatever = false;
+    graph c(1);
 
-int main()
-{
-   char x;
-   ifstream fin;
-   stack <int> moves;
-   string fileName;
-   
-   // Read the name of the graph from the keyboard or
-   // hard code it here for testing.
-   
-   fileName = "graph1.txt";
+    dfs(g, c, 0, whatever);
 
-   //   cout << "Enter filename" << endl;
-   //   cin >> fileName;
-   
-   fin.open(fileName.c_str());
-   if (!fin)
-   {
-      cerr << "Cannot open " << fileName << endl;
-      exit(1);
-   }
+    if (g.numNodes() != c.numNodes()) {
+        return false;
+    }
+    return true;
+}
 
-   try
+// Create a graph sf that contains a spanning forest on the graph g.
+void findSpanningForest(graph &g, graph &sf) {
+    bool whatever = false;
 
-   {
-      cout << "Reading graph" << endl;
-      graph g(fin);
+    for (int i = 0; i < g.numNodes(); i++) {
+        if (g.isVisited(i) == false) {
+            // new spanning tree can be generated
+            node v;
+            v.setNode(i, 0, false, false);
+            sf.addNode(v);
 
-      cout << g;
-	    
-      bool connected;
-      bool cyclic;
+            cout << "sf size: " << sf.numNodes() << endl;
 
-      connected = isConnected(g);
-      cyclic = isCyclic(g);
+            dfs(g, sf, i, whatever);
+        }
+    }
+}
 
-      if (connected)
-	 cout << "Graph is connected" << endl;
-      else
-	 cout << "Graph is not connected" << endl;
+int main() {
+    char x;
+    ifstream fin;
+    stack <int> moves;
+    string fileName;
 
-      if (cyclic)
-	 cout << "Graph contains a cycle" << endl;
-      else
-	 cout << "Graph does not contain a cycle" << endl;
+    // Read the name of the graph from the keyboard or
+    // hard code it here for testing.
 
-      cout << endl;
-     
-      cout << "Finding spanning forest" << endl;
+    fileName = "graph2.txt";
 
-      // Initialize an empty graph to contain the spanning forest
-      graph sf(g.numNodes());
-      findSpanningForest(g,sf);
+    //   cout << "Enter filename" << endl;
+    //   cin >> fileName;
 
-      cout << endl;
+    fin.open(fileName.c_str());
+    if (!fin) {
+        cerr << "Cannot open " << fileName << endl;
+        exit(1);
+    }
 
-      cout << sf;
+    try
 
-      cout << "Spanning forest weight: " << sf.getTotalEdgeWeight()/2 << endl;
+    {
+        cout << "Reading graph" << endl;
+        graph g(fin);
 
-      connected = isConnected(sf);
-      cyclic = isCyclic(sf);
+        cout << g;
 
-      if (connected)
-	 cout << "Graph is connected" << endl;
-      else
-	 cout << "Graph is not connected" << endl;
+        bool connected;
+        bool cyclic;
 
-      if (cyclic)
-	 cout << "Graph contains a cycle" << endl;
-      else
-	 cout << "Graph does not contain a cycle" << endl;
+        connected = isConnected(g);
+        cyclic = isCyclic(g);
 
-      cout << endl;
-   }    
-   catch (indexRangeError &ex) 
-   { 
-      cout << ex.what() << endl; exit(1);
-   }
-   catch (rangeError &ex)
-   {
-      cout << ex.what() << endl; exit(1);
-   }
+        if (connected) {
+            cout << "Graph is connected" << endl;
+        } else {
+            cout << "Graph is not connected" << endl;
+        }
+
+        if (cyclic) {
+            cout << "Graph contains a cycle" << endl;
+        } else {
+            cout << "Graph does not contain a cycle" << endl;
+        }
+
+        cout << endl;
+
+        cout << "Finding spanning forest" << endl;
+
+        // Initialize an empty graph to contain the spanning forest
+        graph sf(g.numNodes());
+        findSpanningForest(g, sf);
+
+        cout << endl;
+
+        cout << sf;
+
+        cout << "Spanning forest weight: " << sf.getTotalEdgeWeight() / 2 << endl;
+
+        connected = isConnected(sf);
+        cyclic = isCyclic(sf);
+
+        if (connected) {
+            cout << "Graph is connected" << endl;
+        } else {
+            cout << "Graph is not connected" << endl;
+        }
+
+        if (cyclic) {
+            cout << "Graph contains a cycle" << endl;
+        } else {
+            cout << "Graph does not contain a cycle" << endl;
+        }
+
+        cout << endl;
+    } catch (indexRangeError &ex) {
+        cout << ex.what() << endl; exit(1);
+    } catch (rangeError &ex) {
+        cout << ex.what() << endl; exit(1);
+    }
 }
 
