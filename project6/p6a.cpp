@@ -4,14 +4,15 @@
 //
 
 #include <iostream>
-#include <limits.h>
-#include "d_except.h"
-#include <list>
 #include <fstream>
-#include "d_matrix.h"
-#include "graph.h"
+#include <list>
+#include <set>
 #include <queue>
 #include <vector>
+#include <limits.h>
+#include "d_except.h"
+#include "d_matrix.h"
+#include "graph.h"
 
 using namespace std;
 
@@ -74,6 +75,56 @@ void findSpanningForest(graph &g, graph &sf) {
     g.clearVisit();
 }
 
+// Create a graph sf that contains a minimum spanning forest on the graph g.
+// sf is expected to be an graph with same number of nodes as g but with no edges
+void prim(graph &g, graph &sf) {
+    // set up
+    set<int> s;
+    for (int i = 1; i < sf.numNodes(); i++) {
+        sf.getNode(i).setWeight(INT_MAX);
+        sf.getNode(i).setId(0);
+    }
+    sf.getNode(0).setWeight(0);
+
+    while((int)s.size() != g.numNodes()) {
+        int minWeight = INT_MAX;
+        int minVertex = -1;
+        for (int i = 0; i < sf.numNodes(); i++) {
+            if(s.find(i) == s.end()) {
+                int w = sf.getNode(i).getWeight();
+                if (w < minWeight) {
+                    minWeight = w;
+                    minVertex = i;
+                }
+            }
+        }
+
+        if (minVertex == -1) {
+            //TODO: This is a forest handle this here
+            cout << "ERROR: Forest in Prim's algorithm" << endl;
+            return;
+        }
+
+        s.insert(minVertex);
+        sf.addEdge(sf.getNode(minVertex).getId(), minVertex, minWeight);
+
+        for (int i = 0; i < g.numNodes(); i++) {
+            if (g.isEdge(minVertex, i)) {
+                node n = sf.getNode(i);
+                edge e = g.getEdge(minVertex, i);
+                if (n.getWeight() > e.getWeight()) {
+                    sf.setNodeWeight(i, e.getWeight());
+                    sf.getNode(i).setId(minVertex);
+                }
+            }
+        }
+    }
+}
+
+void kruskal(graph &g, graph &sf) {
+
+}
+
 int main() {
     ifstream fin;
     stack <int> moves;
@@ -82,7 +133,7 @@ int main() {
     // Read the name of the graph from the keyboard or
     // hard code it here for testing.
 
-    fileName = "graph4.txt";
+    fileName = "graph1.txt";
 
     fin.open(fileName.c_str());
     if (!fin) {
@@ -91,11 +142,9 @@ int main() {
     }
 
     try
-
     {
         cout << "Reading graph" << endl;
         graph g(fin);
-
         cout << g;
 
         bool connected;
@@ -147,6 +196,13 @@ int main() {
         }
 
         cout << endl;
+
+        graph s(g.numNodes());
+        prim(g, s);
+        cout << "Finding MST" << endl;
+        cout << s;
+        cout << "MST Total Weight: " << s.getTotalEdgeWeight() << endl;
+
     } catch (indexRangeError &ex) {
         cout << ex.what() << endl; exit(1);
     } catch (rangeError &ex) {
