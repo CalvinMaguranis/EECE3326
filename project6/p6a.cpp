@@ -24,8 +24,9 @@ void dfs(graph &g, graph &sf, bool &cyclic, int v, int x) {
             if (g.isVisited(w)) {
                 count++;
             } else {
+                int z = g.getEdge(v, w).getWeight();
                 int y = sf.addNode();
-                sf.addEdge(x, y);
+                sf.addEdge(x, y, z);
                 dfs(g, sf, cyclic, w, y);
             }
         }
@@ -100,13 +101,21 @@ void prim(graph &g, graph &sf) {
         }
 
         if (minVertex == -1) {
-            //TODO: This is a forest handle this here
-            cout << "ERROR: Forest in Prim's algorithm" << endl;
-            return;
+            for (int i = 0; i < sf.numNodes(); i++) {
+                if(s.find(i) == s.end()) {
+                    minVertex = i;
+                    minWeight = 0;
+                    sf.getNode(i).setWeight(0);
+                    sf.getNode(i).setId(i);
+                    break;
+                }
+            }
         }
 
         s.insert(minVertex);
-        sf.addEdge(sf.getNode(minVertex).getId(), minVertex, minWeight);
+        if (sf.getNode(minVertex).getId() != minVertex) {
+            sf.addEdge(sf.getNode(minVertex).getId(), minVertex, minWeight);
+        }
 
         for (int i = 0; i < g.numNodes(); i++) {
             if (g.isEdge(minVertex, i)) {
@@ -118,6 +127,12 @@ void prim(graph &g, graph &sf) {
                 }
             }
         }
+    }
+
+    // clean up
+    for (int i = 0; i < sf.numNodes(); i++) {
+        sf.getNode(i).setWeight(0);
+        sf.getNode(i).setId(i);
     }
 }
 
@@ -133,7 +148,7 @@ int main() {
     // Read the name of the graph from the keyboard or
     // hard code it here for testing.
 
-    fileName = "graph1.txt";
+    fileName = "graph4.txt";
 
     fin.open(fileName.c_str());
     if (!fin) {
@@ -170,7 +185,6 @@ int main() {
         cout << "Finding spanning forest" << endl;
 
         // Initialize an empty graph to contain the spanning forest
-        //graph sf(g.numNodes());
         graph sf;
         findSpanningForest(g, sf);
 
@@ -178,7 +192,7 @@ int main() {
 
         cout << sf;
 
-        cout << "Spanning forest weight: " << sf.getTotalEdgeWeight() / 2 << endl;
+        cout << "Spanning forest weight: " << sf.getTotalEdgeWeight() << endl;
 
         connected = isConnected(sf);
         cyclic = isCyclic(sf);
@@ -197,11 +211,11 @@ int main() {
 
         cout << endl;
 
-        graph s(g.numNodes());
-        prim(g, s);
-        cout << "Finding MST" << endl;
-        cout << s;
-        cout << "MST Total Weight: " << s.getTotalEdgeWeight() << endl;
+        graph msf(g.numNodes());
+        prim(g, msf);
+        cout << "Finding minimum spanning forest" << endl;
+        cout << msf;
+        cout << "Minimum spanning forest weight: " << msf.getTotalEdgeWeight() << endl;
 
     } catch (indexRangeError &ex) {
         cout << ex.what() << endl; exit(1);
