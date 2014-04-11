@@ -10,9 +10,11 @@
 #include <queue>
 #include <vector>
 #include <limits.h>
+#include <algorithm>
 #include "d_except.h"
 #include "d_matrix.h"
 #include "graph.h"
+
 
 using namespace std;
 
@@ -136,8 +138,54 @@ void prim(graph &g, graph &sf) {
     }
 }
 
-void kruskal(graph &g, graph &sf) {
+// sort using a custom function object
+struct {
+	bool operator()(edge a, edge b) {
+		return a.getWeight() < b.getWeight();
+	}
+} EdgeCompare;
 
+void kruskal(graph &g, graph &sf) {
+	// set up
+	for (int i =0; i < sf.numNodes(); i++) {
+		sf.getNode(i).setWeight(0);
+		sf.getNode(i).setId(0);
+	}
+
+	// clear any visits used
+	g.clearVisit();
+	g.clearMark();
+
+	// make list of edges
+	vector<edge> e;
+	for (int i = 0; i < g.numNodes(); i++) {
+		for (int j = 0; j < g.numNodes(); j++) {
+			if (g.isEdge(i, j)) {
+				e.push_back(g.getEdge(i, j));
+			}
+		}
+	}
+	
+
+	// sort edges e in non-decreasing order by weight
+	sort(e.begin(), e.end(), EdgeCompare);
+
+	// create MSF
+	for (int k = 0; k < g.numEdges(); k++) {
+		bool srcMarked = sf.isMarked(e[k].getSource());
+		bool destMarked = sf.isMarked(e[k].getDest());
+		if ( !sf.isMarked(e[k].getSource()) || 
+			 !sf.isMarked(e[k].getDest()) )
+		{
+			sf.mark(e[k].getSource());
+			sf.mark(e[k].getDest());
+			sf.addEdge(e[k].getSource(), e[k].getDest(), e[k].getWeight());
+
+			if (isCyclic(sf)) {
+				sf.removeEdge(e[k].getSource(), e[k].getDest());
+			}
+		}
+	}
 }
 
 int main() {
@@ -162,65 +210,49 @@ int main() {
         graph g(fin);
         cout << g;
 
-        bool connected;
-        bool cyclic;
+        bool connected = isConnected(g);
+        bool cyclic = isCyclic(g);
+		if (connected) { cout << "Graph is connected" << endl; }
+		else { cout << "Graph is not connected" << endl; }
+		if (cyclic) { cout << "Graph contains a cycle" << endl; }
+		else { cout << "Graph does not contain a cycle" << endl; }
+		cout << endl;
 
-        connected = isConnected(g);
-        cyclic = isCyclic(g);
-
-        if (connected) {
-            cout << "Graph is connected" << endl;
-        } else {
-            cout << "Graph is not connected" << endl;
-        }
-
-        if (cyclic) {
-            cout << "Graph contains a cycle" << endl;
-        } else {
-            cout << "Graph does not contain a cycle" << endl;
-        }
-
-        cout << endl;
-
-        cout << "Finding spanning forest" << endl;
-
-        // Initialize an empty graph to contain the spanning forest
-        graph sf;
+		// PROJECT 6a
+		cout << "MSF Algorithm: " << endl;
+		graph sf;
+		cout << "Finding spanning forest" << endl;
         findSpanningForest(g, sf);
-
-        cout << endl;
-
         cout << sf;
-
         cout << "Spanning forest weight: " << sf.getTotalEdgeWeight() << endl;
 
-        connected = isConnected(sf);
-        cyclic = isCyclic(sf);
+		// PROJECT 6b
+		// PRIM
+		cout << "Prim algorithm: " << endl;
+        graph prim_msf(g.numNodes());
+		prim(g, prim_msf);
+		cout << prim_msf;
+		cout << "Minimum spanning forest weight: " << prim_msf.getTotalEdgeWeight() << endl; 
 
-        if (connected) {
-            cout << "Graph is connected" << endl;
-        } else {
-            cout << "Graph is not connected" << endl;
-        }
+		// KRUSKAL
+		cout << "Kruskal algorithm: " << endl;
+		graph kruskal_msf(g.numNodes());
+		kruskal(g, kruskal_msf);
+		cout << kruskal_msf;
+		cout << "Minimum spanning forest weight: " << kruskal_msf.getTotalEdgeWeight() << endl;
 
-        if (cyclic) {
-            cout << "Graph contains a cycle" << endl;
-        } else {
-            cout << "Graph does not contain a cycle" << endl;
-        }
-
-        cout << endl;
-
-        graph msf(g.numNodes());
-        prim(g, msf);
-        cout << "Finding minimum spanning forest" << endl;
-        cout << msf;
-        cout << "Minimum spanning forest weight: " << msf.getTotalEdgeWeight() << endl;
+		// COMPARISON
+		cout << endl << endl;
+		cout << "Comparison: MSF=" << sf.getTotalEdgeWeight()
+			<< ", PRIM=" << prim_msf.getTotalEdgeWeight()
+			<< ", KRUSKAL=" << kruskal_msf.getTotalEdgeWeight() << endl;
 
     } catch (indexRangeError &ex) {
         cout << ex.what() << endl; exit(1);
     } catch (rangeError &ex) {
         cout << ex.what() << endl; exit(1);
     }
+
+	system("PAUSE");
 }
 
